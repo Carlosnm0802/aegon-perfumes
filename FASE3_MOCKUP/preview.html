@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AegonPerfumes — Sistema de Diseño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="design-system.css">
+<style>
+  .preview-wrap { max-width: 1000px; margin: 0 auto; padding: var(--space-7) var(--space-4); }
+  .preview-section { margin-bottom: var(--space-8); }
+  .preview-label {
+    font-size: var(--fs-xs);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-4);
+  }
+  .row { display: flex; gap: var(--space-4); flex-wrap: wrap; align-items: center; }
+  .grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-4);
+  }
+  .swatch { width: 100%; height: 64px; border-radius: var(--radius-sm); border: 1px solid var(--color-border); margin-bottom: var(--space-2); }
+  .swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--space-4); }
+  .swatch-name { font-size: var(--fs-xs); color: var(--color-text-secondary); }
+  .placeholder-img {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-text-secondary);
+    font-size: var(--fs-xs);
+    font-family: var(--font-body);
+  }
+</style>
+</head>
+<body>
+
+<div class="preview-wrap">
+
+  <h1>AegonPerfumes</h1>
+  <p>Sistema de diseño — vista de referencia para todos los componentes base.</p>
+
+  <hr class="divider-gold">
+
+  <!-- COLOR -->
+  <section class="preview-section">
+    <div class="preview-label">Paleta</div>
+    <div class="swatch-grid">
+      <div><div class="swatch" style="background:var(--color-bg)"></div><div class="swatch-name">--color-bg</div></div>
+      <div><div class="swatch" style="background:var(--color-surface)"></div><div class="swatch-name">--color-surface</div></div>
+      <div><div class="swatch" style="background:var(--color-accent)"></div><div class="swatch-name">--color-accent</div></div>
+      <div><div class="swatch" style="background:var(--color-accent-hover)"></div><div class="swatch-name">--color-accent-hover</div></div>
+      <div><div class="swatch" style="background:var(--color-text-secondary)"></div><div class="swatch-name">--color-text-secondary</div></div>
+      <div><div class="swatch" style="background:var(--color-border)"></div><div class="swatch-name">--color-border</div></div>
+    </div>
+  </section>
+
+  <!-- TIPOGRAFÍA -->
+  <section class="preview-section">
+    <div class="preview-label">Tipografía</div>
+    <h1 style="margin-bottom:4px;">AEGON</h1>
+    <p style="color:var(--color-text-secondary); margin-bottom:var(--space-5); font-family:var(--font-body);">Cormorant Garamond — títulos</p>
+    <p style="font-family:var(--font-body); color:var(--color-text-primary); font-size:var(--fs-md);">Baccarat Rouge 540 — $450 MXN</p>
+    <p style="font-family:var(--font-body); font-size:var(--fs-sm);">Inter — precios, botones y texto de cuerpo. Esta tipografía mantiene legibilidad incluso en tamaños pequeños de móvil.</p>
+  </section>
+
+  <hr class="divider-gold">
+
+  <!-- BOTONES -->
+  <section class="preview-section">
+    <div class="preview-label">Botones</div>
+    <div class="row">
+      <button class="btn btn-primary">Agregar al carrito</button>
+      <button class="btn btn-secondary">Ver catálogo</button>
+    </div>
+  </section>
+
+  <!-- BADGES -->
+  <section class="preview-section">
+    <div class="preview-label">Badges</div>
+    <div class="row">
+      <span class="badge badge-decant">Decant</span>
+      <span class="badge badge-original">Original</span>
+      <span class="badge badge-bestseller">Más vendido</span>
+    </div>
+  </section>
+
+  <!-- STATUS PILLS -->
+  <section class="preview-section">
+    <div class="preview-label">Estados de pedido (panel admin)</div>
+    <div class="row">
+      <span class="status-pill status-pendiente">Pendiente</span>
+      <span class="status-pill status-preparando">Preparando</span>
+      <span class="status-pill status-enviado">Enviado</span>
+      <span class="status-pill status-entregado">Entregado</span>
+    </div>
+  </section>
+
+  <hr class="divider-gold">
+
+  <!-- TARJETA DE PRODUCTO -->
+  <section class="preview-section">
+    <div class="preview-label">Tarjeta de producto (componente principal)</div>
+    <div class="grid-cards">
+
+      <div class="product-card">
+        <div class="product-card__image"><div class="placeholder-img">Imagen del producto</div></div>
+        <div class="product-card__body">
+          <div class="product-card__brand">Maison Francis Kurkdjian</div>
+          <div class="product-card__name">Baccarat Rouge 540</div>
+          <div class="product-card__badges">
+            <span class="badge badge-decant">Decant</span>
+            <span class="badge badge-bestseller">Más vendido</span>
+          </div>
+          <div class="variant-selector">
+            <button class="variant-pill" aria-pressed="false">3ml</button>
+            <button class="variant-pill" aria-pressed="true">5ml</button>
+            <button class="variant-pill" aria-pressed="false">10ml</button>
+            <button class="variant-pill" disabled>30ml</button>
+          </div>
+          <div class="product-card__price">$450 MXN</div>
+          <button class="btn btn-primary" style="width:100%;">Agregar al carrito</button>
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="product-card__image"><div class="placeholder-img">Imagen del producto</div></div>
+        <div class="product-card__body">
+          <div class="product-card__brand">Lattafa</div>
+          <div class="product-card__name">Khamrah</div>
+          <div class="product-card__badges">
+            <span class="badge badge-original">Original</span>
+          </div>
+          <div class="variant-selector">
+            <button class="variant-pill" aria-pressed="true">100ml</button>
+          </div>
+          <div class="product-card__price">$1,200 MXN</div>
+          <button class="btn btn-primary" style="width:100%;">Agregar al carrito</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr class="divider-gold">
+
+  <!-- CARRITO -->
+  <section class="preview-section">
+    <div class="preview-label">Carrito lateral (extracto)</div>
+    <div style="max-width:420px; background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:var(--space-5);">
+      <h3>Tu carrito</h3>
+      <div class="cart-item">
+        <div style="width:64px;height:64px;background:var(--color-surface-raised);border-radius:var(--radius-sm);"></div>
+        <div style="flex:1;">
+          <div style="color:var(--color-text-primary); font-size:var(--fs-sm);">Baccarat Rouge 540 — 5ml</div>
+          <div style="color:var(--color-text-secondary); font-size:var(--fs-xs);">Cantidad: 1</div>
+        </div>
+        <div style="color:var(--color-text-primary); font-size:var(--fs-sm);">$450</div>
+      </div>
+      <div class="cart-total-row">
+        <span>Total</span>
+        <span>$450 MXN</span>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider-gold">
+
+  <!-- FORMULARIO -->
+  <section class="preview-section">
+    <div class="preview-label">Campo de formulario (checkout)</div>
+    <div style="max-width:420px;">
+      <div class="form-field">
+        <label for="nombre">Nombre completo</label>
+        <input type="text" id="nombre" placeholder="Tu nombre">
+      </div>
+      <div class="form-field">
+        <label for="entrega">Tipo de entrega</label>
+        <select id="entrega">
+          <option>Recoger en local</option>
+          <option>Paquetería</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+</body>
+</html>
