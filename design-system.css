@@ -239,8 +239,14 @@ a:hover { color: var(--color-accent-hover); }
   width: 100%;
   aspect-ratio: 1 / 1;
   background-color: var(--color-surface-raised); /* placeholder mientras carga la foto real */
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
+}
+
+.product-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .product-card__body {
@@ -494,7 +500,7 @@ a:hover { color: var(--color-accent-hover); }
 
 .hero {
   position: relative;
-  padding: var(--space-8) var(--space-4);
+  padding: var(--space-7) var(--space-4);
   text-align: center;
   overflow: hidden;
 }
@@ -522,7 +528,10 @@ a:hover { color: var(--color-accent-hover); }
 
 .hero__title {
   position: relative;
-  font-size: var(--fs-2xl);
+  /* clamp: nunca baja de 28px ni sube de 48px, escala según
+     el ancho de pantalla — evita que se vea apretado en
+     celulares de 320-360px sin perder impacto en desktop */
+  font-size: clamp(1.75rem, 5vw + 1rem, var(--fs-2xl));
   margin-bottom: var(--space-3);
 }
 
@@ -573,8 +582,6 @@ a:hover { color: var(--color-accent-hover); }
   border-radius: var(--radius-md);
   overflow: hidden;
   background-color: var(--color-surface);
-  background-size: cover;
-  background-position: center;
   border: 1px solid var(--color-border);
   display: flex;
   align-items: flex-end;
@@ -583,22 +590,33 @@ a:hover { color: var(--color-accent-hover); }
   transition: border-color var(--transition-base);
 }
 
+.category-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
 .category-card::before {
   content: '';
   position: absolute;
   inset: 0;
+  z-index: 1;
   background: linear-gradient(180deg, transparent 40%, rgba(8, 8, 9, 0.85) 100%);
-}
-
-.category-card:hover {
-  border-color: var(--color-accent);
 }
 
 .category-card__label {
   position: relative;
+  z-index: 2;
   font-family: var(--font-display);
   font-size: var(--fs-md);
   color: var(--color-text-primary);
+}
+
+.category-card:hover {
+  border-color: var(--color-accent);
 }
 
 /* En móvil, las categorías se apilan en una sola columna ancha
@@ -761,10 +779,16 @@ a:hover { color: var(--color-accent-hover); }
 .instagram-grid__item {
   position: relative;
   aspect-ratio: 1 / 1;
-  background-size: cover;
-  background-position: center;
   border-radius: var(--radius-sm);
   overflow: hidden;
+  display: block;
+}
+
+.instagram-grid__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .instagram-grid__item::after {
@@ -783,5 +807,43 @@ a:hover { color: var(--color-accent-hover); }
 @media (max-width: 640px) {
   .instagram-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ============================================================
+   GRID DE PRODUCTOS
+   ============================================================
+   Usado en Home (destacados) y Catálogo. En móvil forzamos
+   2 columnas fijas en vez de dejar que auto-fill decida —
+   así el usuario ve el catálogo como cuadrícula desde el
+   primer scroll, no una sola columna de tarjetas gigantes.
+   ============================================================ */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+@media (max-width: 560px) {
+  .product-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+  }
+
+  .product-card__body {
+    padding: var(--space-3);
+  }
+
+  .product-card__name {
+    font-size: var(--fs-sm);
+  }
+
+  .product-card__price {
+    font-size: var(--fs-base);
+  }
+
+  .variant-pill {
+    padding: 4px var(--space-2);
   }
 }
