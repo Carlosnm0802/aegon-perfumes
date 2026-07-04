@@ -229,6 +229,119 @@
    class="whatsapp-float" aria-label="Escríbenos por WhatsApp">
   <svg viewBox="0 0 24 24" width="26" height="26"><path d="M12 2a10 10 0 00-8.6 15L2 22l5.2-1.4A10 10 0 1012 2zm5.6 14.2c-.2.6-1.3 1.2-1.9 1.3-.5.1-1.1.1-1.8-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5.1-4.5-.1-.2-1.2-1.6-1.2-3s.8-2.1 1-2.4c.2-.2.5-.3.7-.3h.5c.2 0 .4 0 .6.5.2.5.7 1.8.8 1.9.1.2.1.3 0 .5-.1.2-.1.3-.3.5l-.4.5c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1.2-.2.7-.8.9-1.1.2-.3.4-.2.6-.1.2.1 1.5.7 1.8.8.3.1.5.2.5.3.1.2.1.6-.1 1.1z"/></svg>
 </a>
+<<!-- ============================================================
+     CONEXIÓN A SUPABASE
+     ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
 
+  // Credenciales del proyecto. La publishable key es segura de
+  // exponer aquí — está protegida por las políticas RLS que
+  // configuramos en el Bloque 4.4, no por estar oculta.
+  const SUPABASE_URL = 'https://eltgbuxccrpyjlbhzmut.supabase.co';
+  const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_tg-YNl68r5gjMeRHs49J4A_7zg5Ubm-';
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+
+  // ============================================================
+  // Carga y renderiza los productos de "Más vendidos"
+  // ============================================================
+  async function cargarMasVendidos() {
+    const grid = document.querySelector('.product-grid');
+    if (!grid) return;
+
+    // Nota: "type" ya no vive en products (Bloque 4.5.1) — ahora
+    // se pide desde variants, porque un mismo producto puede tener
+    // variantes decant y variantes completo al mismo tiempo.
+    const { data: products, error } = await supabaseClient
+      .from('products')
+      .select(`
+        id, name, image_url,
+        brand:brands(name),
+        variants(id, size_label, price, available, type)
+      `)
+      .order('created_at', { ascending: false })
+      .limit(4);
+
+    if (error) {
+      console.error('Error cargando productos desde Supabase:', error);
+      return;
+    }
+
+    grid.innerHTML = products.map(renderProductCard).join('');
+    grid.querySelectorAll('.product-card').forEach(activarSelectorDeVariante);
+  }
+
+  // Construye el HTML de una tarjeta, reutilizando las clases
+  // ya definidas en design-system.css
+  function renderProductCard(product) {
+    // Ordenamos las variantes de menor a mayor precio (3ml antes que 100ml)
+    const variantes = [...product.variants].sort((a, b) => a.price - b.price);
+    const primera = variantes[0];
+
+    const pills = variantes.map((v, i) => `
+      <button class="variant-pill"
+              data-price="${v.price}"
+              data-type="${v.type}"
+              aria-pressed="${i === 0}"
+              ${!v.available ? 'disabled' : ''}>
+        ${v.size_label}
+      </button>
+    `).join('');
+
+    const precioInicial = primera ? formatearPrecio(primera.price) : '—';
+
+    return `
+      <div class="product-card">
+        <div class="product-card__image">
+          <img src="${product.image_url}" alt="${product.name}" loading="lazy" width="440" height="440">
+        </div>
+        <div class="product-card__body">
+          <div class="product-card__brand">${product.brand?.name ?? ''}</div>
+          <div class="product-card__name">${product.name}</div>
+          <div class="product-card__badges">${renderBadge(primera?.type)}</div>
+          <div class="variant-selector">${pills}</div>
+          <div class="product-card__price">${precioInicial}</div>
+          <button class="btn btn-primary" style="width:100%;">Agregar al carrito</button>
+        </div>
+      </div>
+    `;
+  }
+
+  // El badge depende del tipo de la VARIANTE seleccionada, no del
+  // producto — un mismo perfume puede mostrarse como "Decant" o
+  // "Completo" según el tamaño que el cliente toque.
+  function renderBadge(type) {
+    const badgeClass = type === 'decant' ? 'badge-decant' : 'badge-original';
+    const badgeLabel = type === 'decant' ? 'Decant' : 'Completo';
+    return `<span class="badge ${badgeClass}">${badgeLabel}</span>`;
+  }
+
+  // Al hacer click en una variante: la marca como seleccionada,
+  // actualiza el precio y actualiza el badge — sin recargar la
+  // página, tal como se describió en el wireframe de Fase 3.
+  function activarSelectorDeVariante(card) {
+    const pills = card.querySelectorAll('.variant-pill');
+    const precioEl = card.querySelector('.product-card__price');
+    const badgesEl = card.querySelector('.product-card__badges');
+
+    pills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        if (pill.disabled) return;
+        pills.forEach(p => p.setAttribute('aria-pressed', 'false'));
+        pill.setAttribute('aria-pressed', 'true');
+        precioEl.textContent = formatearPrecio(pill.dataset.price);
+        badgesEl.innerHTML = renderBadge(pill.dataset.type);
+      });
+    });
+  }
+
+  function formatearPrecio(valor) {
+    return `$${Number(valor).toLocaleString('es-MX')} MXN`;
+  }
+
+  document.addEventListener('DOMContentLoaded', cargarMasVendidos);
+
+</script>
 </body>
 </html>
