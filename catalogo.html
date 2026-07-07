@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo — AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+
+<header class="navbar" id="navbar-container"></header>
+
+<div class="container">
+
+  <section class="section catalog-header">
+    <h1 class="section__title">Catálogo</h1>
+    <button class="btn btn-secondary" id="btn-abrir-filtros">Filtrar</button>
+  </section>
+
+  <div id="catalog-empty" class="catalog-empty" hidden>
+    No encontramos perfumes con esos filtros. Prueba quitando alguno.
+  </div>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="product-grid catalog-grid"></div>
+  </section>
+
+  <div class="catalog-load-more">
+    <button class="btn btn-secondary" id="btn-cargar-mas" hidden>Cargar más</button>
+  </div>
+
+</div>
+
+<footer class="footer" id="footer-container"></footer>
+<div id="whatsapp-float-container"></div>
+<div id="filter-panel-container"></div>
+
+<script type="module" src="js/pages/catalogo.js"></script>
+</body>
+</html>
