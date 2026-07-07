@@ -847,3 +847,49 @@ a:hover { color: var(--color-accent-hover); }
     padding: 4px var(--space-2);
   }
 }
+/* ============================================================
+   SKELETON LOADER
+   ============================================================
+   Tarjetas "fantasma" mientras Supabase responde. Usa el mismo
+   tamaño y forma que .product-card para que no haya "salto" de
+   layout cuando los datos reales se renderizan.
+   ============================================================ */
+
+.skeleton-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.skeleton-card__image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background-color: var(--color-surface-raised);
+}
+
+.skeleton-card__body {
+  padding: var(--space-4);
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-raised);
+  margin-bottom: var(--space-3);
+}
+
+.skeleton-line--short  { width: 40%; }
+.skeleton-line--medium { width: 70%; }
+.skeleton-line--long   { width: 55%; height: 20px; }
+
+/* Pulso sutil dorado — coherente con --shadow-glow del resto del sitio */
+.skeleton-card__image,
+.skeleton-line {
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
