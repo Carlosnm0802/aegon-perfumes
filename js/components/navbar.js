@@ -15,7 +15,7 @@ export function renderNavbar() {
     <a href="index.html" class="navbar__logo">AEGON<span>PERFUMES</span></a>
     <div class="navbar__actions">
       <button class="navbar__icon-btn" aria-label="Buscar">⌕</button>
-      <button class="navbar__icon-btn" aria-label="Ver carrito">
+      <button class="navbar__icon-btn" id="navbar-cart-button" aria-label="Ver carrito">
         ⛁
         <span class="navbar__cart-count" id="navbar-cart-count">0</span>
       </button>

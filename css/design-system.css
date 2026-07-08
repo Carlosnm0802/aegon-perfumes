@@ -1108,3 +1108,133 @@ a:hover { color: var(--color-accent-hover); }
 .navbar__logo:hover {
   color: var(--color-text-primary);
 }
+/* ============================================================
+   CARRITO LATERAL — mostrar/ocultar
+   ============================================================
+   Las clases base (.cart-overlay, .cart-panel, .cart-item,
+   .cart-total-row) ya existían desde Fase 3, pero les faltaba
+   el mecanismo de mostrar/ocultar — por defecto ahora quedan
+   fuera de pantalla, con la misma técnica que ya usamos en el
+   panel de filtros del Bloque 4.
+   ============================================================ */
+
+.cart-overlay {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+}
+
+.cart-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cart-panel {
+  transform: translateX(100%);
+  transition: transform var(--transition-base);
+}
+
+.cart-panel.is-visible {
+  transform: translateX(0);
+}
+
+.cart-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.cart-panel__header h3 {
+  margin: 0;
+}
+
+.cart-panel__close {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-lg);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.cart-panel__body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.cart-empty {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: var(--space-6) 0;
+}
+
+.cart-item img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-raised);
+  flex-shrink: 0;
+}
+
+.cart-item__info {
+  flex: 1;
+  min-width: 0; /* permite que el texto largo trunque en vez de desbordar */
+}
+
+.cart-item__brand {
+  font-size: var(--fs-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cart-item__name {
+  font-size: var(--fs-sm);
+  color: var(--color-text-primary);
+  margin: var(--space-1) 0;
+}
+
+.cart-item__price {
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-2);
+}
+
+.cart-item__quantity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.qty-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  line-height: 1;
+}
+
+.qty-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.cart-item__remove {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--fs-sm);
+  opacity: 0.6;
+}
+
+.cart-item__remove:hover {
+  opacity: 1;
+}

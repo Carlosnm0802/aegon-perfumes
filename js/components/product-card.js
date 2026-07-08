@@ -1,24 +1,21 @@
 import { formatearPrecio } from '../utils/format.js';
+import { agregarAlCarrito } from '../cart.js';
 
 // ============================================================
 // TARJETA DE PRODUCTO
 // ============================================================
-// Construye el HTML de una tarjeta de producto y activa la
-// interacción del selector de variante (tamaño/precio).
-//
-// Es el componente más importante del sitio: no hay página de
-// ficha de producto individual en el MVP, así que esta tarjeta
-// ES la decisión de compra completa. Se usa en Home ("Más
-// vendidos") y, en el Bloque 4, también en el Catálogo.
+// Construye el HTML de una tarjeta de producto y activa toda su
+// interacción: selector de variante (tamaño/precio) y el botón
+// "Agregar al carrito". Se usa en Home y Catálogo.
 // ============================================================
 
 export function renderProductCard(product) {
-  // Ordenamos las variantes de menor a mayor precio (3ml antes que 100ml)
   const variantes = [...product.variants].sort((a, b) => a.price - b.price);
   const primera = variantes[0];
 
   const pills = variantes.map((v, i) => `
     <button class="variant-pill"
+            data-variant-id="${v.id}"
             data-price="${v.price}"
             data-type="${v.type}"
             aria-pressed="${i === 0}"
@@ -30,7 +27,7 @@ export function renderProductCard(product) {
   const precioInicial = primera ? formatearPrecio(primera.price) : '—';
 
   return `
-    <div class="product-card">
+    <div class="product-card" data-product-id="${product.id}">
       <div class="product-card__image">
         <img src="${product.image_url}" alt="${product.name}" loading="lazy" width="440" height="440">
       </div>
@@ -46,22 +43,19 @@ export function renderProductCard(product) {
   `;
 }
 
-// El badge depende del tipo de la VARIANTE seleccionada, no del
-// producto — un mismo perfume puede mostrarse como "Decant" o
-// "Completo" según el tamaño que el cliente toque.
 function renderBadge(type) {
   const badgeClass = type === 'decant' ? 'badge-decant' : 'badge-original';
   const badgeLabel = type === 'decant' ? 'Decant' : 'Completo';
   return `<span class="badge ${badgeClass}">${badgeLabel}</span>`;
 }
 
-// Al hacer click en una variante: la marca como seleccionada,
-// actualiza el precio y el badge — sin recargar la página, tal
-// como se describió en el wireframe de Fase 3.
+// Activa el selector de variante Y el botón de agregar al
+// carrito de una tarjeta ya insertada en el DOM.
 export function activarSelectorDeVariante(card) {
   const pills = card.querySelectorAll('.variant-pill');
   const precioEl = card.querySelector('.product-card__price');
   const badgesEl = card.querySelector('.product-card__badges');
+  const btnAgregar = card.querySelector('.product-card__body > .btn');
 
   pills.forEach(pill => {
     pill.addEventListener('click', () => {
@@ -72,4 +66,35 @@ export function activarSelectorDeVariante(card) {
       badgesEl.innerHTML = renderBadge(pill.dataset.type);
     });
   });
+
+  if (btnAgregar) {
+    btnAgregar.addEventListener('click', () => {
+      const pillActivo = card.querySelector('.variant-pill[aria-pressed="true"]');
+      if (!pillActivo || pillActivo.disabled) return;
+
+      const item = {
+        variantId: pillActivo.dataset.variantId,
+        productId: card.dataset.productId,
+        name: card.querySelector('.product-card__name').textContent,
+        brand: card.querySelector('.product-card__brand').textContent,
+        image: card.querySelector('.product-card__image img').src,
+        sizeLabel: pillActivo.textContent.trim(),
+        type: pillActivo.dataset.type,
+        price: Number(pillActivo.dataset.price),
+      };
+
+      agregarAlCarrito(item);
+
+      // Feedback breve — confirma la acción sin necesidad de abrir
+      // el panel lateral automáticamente (eso sería intrusivo si
+      // el usuario está comprando varios productos seguidos).
+      const textoOriginal = btnAgregar.textContent;
+      btnAgregar.textContent = '¡Agregado! ✓';
+      btnAgregar.disabled = true;
+      setTimeout(() => {
+        btnAgregar.textContent = textoOriginal;
+        btnAgregar.disabled = false;
+      }, 1200);
+    });
+  }
 }
