@@ -6,7 +6,7 @@ import { renderFilterPanel, activarPanelFiltros } from '../components/filter-pan
 
 const PRODUCTOS_POR_PAGINA = 12;
 
-let filtros = { categoria: '', tipo: '', precio: '', marcas: [] };
+let filtros = { categoria: '', tipo: '', precio: '', marcas: [], busqueda: '' };
 let paginaActual = 0;
 
 // ============================================================
@@ -20,23 +20,57 @@ async function cargarOpcionesDeFiltro() {
   return { categorias: categorias ?? [], marcas: marcas ?? [] };
 }
 
-// Lee ?categoria=arabe de la URL (llegada desde el Home) y la
-// aplica como filtro inicial, reflejándola en el pill correcto.
+// Lee ?categoria= y/o ?buscar= de la URL (llegada desde el Home
+// o desde la barra de búsqueda) y los aplica como filtros
+// iniciales, reflejando la categoría en el pill correcto.
 function aplicarFiltroDesdeURL() {
   const params = new URLSearchParams(window.location.search);
   const categoria = params.get('categoria');
-  if (!categoria) return;
+  const busqueda = params.get('buscar');
 
-  filtros.categoria = categoria;
-
-  const pill = document.querySelector(
-    `.filter-pills[data-filter-group="categoria"] .filter-pill[data-value="${categoria}"]`
-  );
-  if (pill) {
-    document.querySelectorAll('.filter-pills[data-filter-group="categoria"] .filter-pill')
-      .forEach(p => p.setAttribute('aria-pressed', 'false'));
-    pill.setAttribute('aria-pressed', 'true');
+  if (categoria) {
+    filtros.categoria = categoria;
+    const pill = document.querySelector(
+      `.filter-pills[data-filter-group="categoria"] .filter-pill[data-value="${categoria}"]`
+    );
+    if (pill) {
+      document.querySelectorAll('.filter-pills[data-filter-group="categoria"] .filter-pill')
+        .forEach(p => p.setAttribute('aria-pressed', 'false'));
+      pill.setAttribute('aria-pressed', 'true');
+    }
   }
+
+  if (busqueda) {
+    filtros.busqueda = busqueda;
+  }
+
+  mostrarIndicadorBusqueda();
+}
+
+// Muestra u oculta el aviso "Resultados para: X" arriba del grid,
+// con un enlace para quitar la búsqueda sin perder los demás
+// filtros que estén activos.
+function mostrarIndicadorBusqueda() {
+  const indicador = document.getElementById('catalog-search-indicator');
+  if (!indicador) return;
+
+  if (!filtros.busqueda) {
+    indicador.hidden = true;
+    return;
+  }
+
+  indicador.hidden = false;
+  indicador.innerHTML = `
+    Resultados para “${filtros.busqueda}” ·
+    <a href="#" id="catalog-search-clear">Quitar</a>
+  `;
+
+  document.getElementById('catalog-search-clear').addEventListener('click', (e) => {
+    e.preventDefault();
+    filtros.busqueda = '';
+    mostrarIndicadorBusqueda();
+    cargarProductos({ reset: true });
+  });
 }
 
 // Traduce el rango elegido ("500-1000", "2000-") a valores
@@ -92,8 +126,46 @@ function construirConsulta() {
 }
 
 // ============================================================
+// BÚSQUEDA DE TEXTO LIBRE
+// ============================================================
+// Combinar en un solo .or() una columna propia (products.name)
+// con una columna de una tabla relacionada (brands.name) tiene
+// soporte limitado en PostgREST, sobre todo junto a los !inner
+// que ya usamos para categoría/marca/variantes — puede fallar
+// en silencio. En vez de eso: resolvemos primero qué marcas
+// coinciden con el texto (consulta simple y confiable), y el
+// filtro final del catálogo solo usa columnas de la propia tabla
+// products (name, brand_id) — sin cruces frágiles.
+// ============================================================
+async function aplicarBusqueda(query) {
+  if (!filtros.busqueda) return query;
+
+  const termino = `%${filtros.busqueda}%`;
+
+  const { data: marcasCoincidentes, error } = await supabaseClient
+    .from('brands')
+    .select('id')
+    .ilike('name', termino);
+
+  if (error) {
+    console.error('Error buscando marcas coincidentes:', error);
+    return query.ilike('name', termino);
+  }
+
+  const idsMarcas = (marcasCoincidentes ?? []).map(m => m.id);
+
+  if (idsMarcas.length > 0) {
+    return query.or(`name.ilike.${termino},brand_id.in.(${idsMarcas.join(',')})`);
+  }
+  return query.ilike('name', termino);
+}
+
+// ============================================================
 // CARGA Y RENDERIZADO
 // ============================================================
+const MENSAJE_SIN_RESULTADOS = 'No encontramos perfumes con esos filtros. Prueba quitando alguno.';
+const MENSAJE_ERROR = 'Ocurrió un problema al cargar el catálogo. Intenta de nuevo en unos segundos.';
+
 async function cargarProductos({ reset = false } = {}) {
   const grid = document.querySelector('.catalog-grid');
   const btnCargarMas = document.getElementById('btn-cargar-mas');
@@ -105,16 +177,27 @@ async function cargarProductos({ reset = false } = {}) {
     mensajeVacio.hidden = true;
   }
 
-  const { data: products, error } = await construirConsulta();
+  let query = construirConsulta();
+  query = await aplicarBusqueda(query);
 
+  const { data: products, error } = await query;
+
+  // Sin importar la causa del error, el skeleton SIEMPRE se quita
+  // aquí y se le avisa al usuario — nunca se queda pegado en
+  // "cargando" para siempre.
   if (error) {
     console.error('Error cargando el catálogo desde Supabase:', error);
+    grid.innerHTML = '';
+    mensajeVacio.textContent = MENSAJE_ERROR;
+    mensajeVacio.hidden = false;
+    btnCargarMas.hidden = true;
     return;
   }
 
   if (reset) grid.innerHTML = '';
 
   if (reset && products.length === 0) {
+    mensajeVacio.textContent = MENSAJE_SIN_RESULTADOS;
     mensajeVacio.hidden = false;
     btnCargarMas.hidden = true;
     return;
@@ -146,6 +229,7 @@ function leerFiltrosDelPanel() {
   };
 
   filtros = {
+    ...filtros, // conserva 'busqueda' si venía de la URL o de una búsqueda previa
     categoria: leerGrupo('categoria'),
     tipo: leerGrupo('tipo'),
     precio: leerGrupo('precio'),

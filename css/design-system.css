@@ -1254,3 +1254,78 @@ a:hover { color: var(--color-accent-hover); }
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+/* ============================================================
+   BARRA DE BÚSQUEDA (slide-down)
+   ============================================================
+   Desplegable debajo del navbar, oculta por defecto. Usa
+   max-height en vez de display:none para poder animar la
+   transición — igual de "elegante" que un fade, pero funciona
+   con contenido de altura variable.
+   ============================================================ */
+
+.search-bar {
+  max-height: 0;
+  overflow: hidden;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  transition: max-height var(--transition-base);
+}
+
+.search-bar.is-visible {
+  max-height: 72px;
+}
+
+.search-bar__form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.search-bar__icon {
+  flex-shrink: 0;
+  stroke: var(--color-text-secondary);
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+
+.search-bar__input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  outline: none;
+}
+
+.search-bar__input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.search-bar__close {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: var(--fs-base);
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* ============================================================
+   INDICADOR DE BÚSQUEDA ACTIVA (en Catálogo)
+   ============================================================ */
+
+.catalog-search-indicator {
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+  padding-bottom: var(--space-4);
+}
+
+.catalog-search-indicator a {
+  color: var(--color-accent);
+}
