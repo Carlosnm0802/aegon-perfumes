@@ -16,7 +16,10 @@ export function renderNavbar() {
     <div class="navbar__actions">
       <button class="navbar__icon-btn" aria-label="Buscar">⌕</button>
       <button class="navbar__icon-btn" id="navbar-cart-button" aria-label="Ver carrito">
-        ⛁
+        <svg class="navbar__icon-svg" viewBox="0 0 24 24" width="22" height="22">
+          <path d="M6 7h12l-1 13a1 1 0 01-1 1H8a1 1 0 01-1-1L6 7z"/>
+          <path d="M9 7V5a3 3 0 016 0v2"/>
+        </svg>
         <span class="navbar__cart-count" id="navbar-cart-count">0</span>
       </button>
     </div>

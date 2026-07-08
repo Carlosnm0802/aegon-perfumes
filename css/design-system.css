@@ -1238,3 +1238,19 @@ a:hover { color: var(--color-accent-hover); }
 .cart-item__remove:hover {
   opacity: 1;
 }
+/* ============================================================
+   NAVBAR — ícono del carrito como SVG
+   ============================================================
+   Mismo lenguaje visual que los íconos de "Por qué elegirnos"
+   y el de WhatsApp: trazo fino, sin relleno, hereda el color
+   del texto (currentColor) para que funcione igual en hover.
+   ============================================================ */
+
+.navbar__icon-svg {
+  display: block;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
