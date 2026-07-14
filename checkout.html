@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+
+<header class="navbar" id="navbar-container"></header>
+<div id="search-bar-container"></div>
+
+<div class="container">
+
+  <section class="section checkout-header">
+    <h1 class="section__title">Finalizar compra</h1>
+  </section>
+
+  <!-- Se muestra si el carrito llega vacío a esta página -->
+  <div id="checkout-empty" class="catalog-empty" hidden>
+    Tu carrito está vacío. <a href="catalogo.html">Ir al catálogo</a>
+  </div>
+
+  <!-- Contenido real del checkout: resumen + formulario -->
+  <div id="checkout-content" class="checkout-layout" hidden>
+
+    <section class="checkout-summary">
+      <h2 class="checkout-summary__title">Tu pedido</h2>
+      <div id="checkout-items"></div>
+      <div class="cart-total-row" id="checkout-total-row"></div>
+    </section>
+
+    <section class="checkout-form-section">
+      <h2 class="checkout-summary__title">Tus datos</h2>
+      <form id="checkout-form">
+
+        <div class="form-field">
+          <label for="input-nombre">Nombre completo</label>
+          <input type="text" id="input-nombre" name="customer_name" required>
+        </div>
+
+        <div class="form-field">
+          <label for="input-telefono">Teléfono (WhatsApp)</label>
+          <input type="tel" id="input-telefono" name="customer_phone" required>
+        </div>
+
+        <div class="form-field">
+          <label for="input-email">Correo (opcional)</label>
+          <input type="email" id="input-email" name="customer_email">
+        </div>
+
+        <div class="form-field">
+          <label for="input-entrega">Tipo de entrega</label>
+          <select id="input-entrega" name="delivery_type" required>
+            <option value="local">Recoger en persona</option>
+            <option value="envio_local">Envío local (mismo día/área)</option>
+            <option value="paqueteria">Paquetería nacional</option>
+          </select>
+        </div>
+
+        <!-- Solo se muestra si el tipo de entrega no es "recoger en persona" -->
+        <div class="form-field" id="campo-direccion" hidden>
+          <label for="input-direccion">Dirección de entrega</label>
+          <input type="text" id="input-direccion" name="delivery_address">
+        </div>
+
+        <div id="checkout-error" class="checkout-error" hidden></div>
+
+        <button type="submit" class="btn btn-primary" id="btn-confirmar-pedido" style="width:100%;">
+          Confirmar pedido
+        </button>
+      </form>
+    </section>
+
+  </div>
+
+  <!-- Mensaje temporal tras confirmar — el Bloque 7B lo reemplaza
+       por la redirección real a MercadoPago -->
+  <div id="checkout-success" class="checkout-success" hidden>
+    <h2>¡Pedido recibido!</h2>
+    <p>Tu pedido quedó registrado. En breve conectaremos el pago en línea — por ahora, nos pondremos en contacto por WhatsApp para confirmar el pago y la entrega.</p>
+    <a href="index.html" class="btn btn-primary">Volver al inicio</a>
+  </div>
+
+</div>
+
+<footer class="footer" id="footer-container"></footer>
+<div id="whatsapp-float-container"></div>
+<div id="cart-panel-container"></div>
+
+<script type="module" src="js/pages/checkout.js"></script>
+</body>
+</html>

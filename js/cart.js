@@ -74,3 +74,10 @@ export function calcularTotal(carrito) {
 export function contarItems(carrito) {
   return carrito.reduce((total, item) => total + item.quantity, 0);
 }
+
+// Se llama una sola vez, justo después de guardar el pedido en
+// Supabase con éxito — el carrito no debe seguir mostrando
+// productos que ya se confirmaron como pedido.
+export function vaciarCarrito() {
+  guardarCarrito([]);
+}
