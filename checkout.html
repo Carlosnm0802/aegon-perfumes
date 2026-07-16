@@ -81,8 +81,15 @@
        por la redirección real a MercadoPago -->
   <div id="checkout-success" class="checkout-success" hidden>
     <h2>¡Pedido recibido!</h2>
-    <p>Tu pedido quedó registrado. En breve conectaremos el pago en línea — por ahora, nos pondremos en contacto por WhatsApp para confirmar el pago y la entrega.</p>
-    <a href="index.html" class="btn btn-primary">Volver al inicio</a>
+    <p id="checkout-success-message">Tu pedido quedó registrado correctamente.</p>
+    <p id="checkout-order-id" class="checkout-success__order"></p>
+    <p id="checkout-payment-note">Si no pudimos abrir el pago en línea, puedes terminar el pedido por transferencia y enviarnos tu comprobante por WhatsApp.</p>
+    <div class="checkout-success__actions">
+      <a id="checkout-whatsapp-transfer" href="#" class="btn btn-primary" target="_blank" rel="noopener">
+        Enviar comprobante por WhatsApp
+      </a>
+      <a href="index.html" class="btn btn-secondary">Volver al inicio</a>
+    </div>
   </div>
 
 </div>

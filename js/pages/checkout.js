@@ -160,34 +160,33 @@ async function iniciarCheckout() {
       const carritoActual = obtenerCarrito();
       const pedido = await guardarPedido(datosCliente, carritoActual);
 
-      btnConfirmar.textContent = 'Conectando con MercadoPago...';
+      btnConfirmar.textContent = 'Conectando con el pago...';
 
-      // La Edge Function crea la "preferencia" de pago usando el
-      // Access Token real (que nunca sale de Supabase) y nos
-      // devuelve la URL de checkout de MercadoPago.
-      const { data: preferencia, error: errorPreferencia } = await supabaseClient.functions.invoke(
-        'crear-preferencia',
+      // La Edge Function crea la sesión de pago usando el Secret
+      // Key real de Stripe (que nunca sale de Supabase) y nos
+      // devuelve la URL de checkout.
+      const { data: sesion, error: errorSesion } = await supabaseClient.functions.invoke(
+        'crear-sesion-pago',
         {
           body: {
             orderId: pedido.id,
             items: carritoActual,
-            customerName: datosCliente.customer_name,
             customerEmail: datosCliente.customer_email,
           },
         }
       );
 
-      if (errorPreferencia || !preferencia?.sandbox_init_point) {
-        throw errorPreferencia || new Error('No se recibió una URL de pago válida.');
+      if (errorSesion || !sesion?.checkout_url) {
+        throw errorSesion || new Error('No se recibió una URL de pago válida.');
       }
 
       vaciarCarrito();
 
-      // [ALERTA] Usamos sandbox_init_point mientras trabajamos con
-      // credenciales de PRUEBA (TEST-...). Al pasar a producción,
-      // este debe cambiar a preferencia.init_point — es la única
-      // línea que hay que tocar para ese momento.
-      window.location.href = preferencia.sandbox_init_point;
+      // A diferencia de MercadoPago, Stripe usa la MISMA URL para
+      // modo prueba y producción — el cambio entre uno y otro se
+      // hace solo con qué Secret Key configuraste en Supabase
+      // (sk_test_... vs sk_live_...), sin tocar esta línea.
+      window.location.href = sesion.checkout_url;
     } catch (error) {
       console.error('Error guardando el pedido o creando el pago:', error);
       mostrarError('No pudimos procesar tu pedido. Intenta de nuevo en unos segundos.');

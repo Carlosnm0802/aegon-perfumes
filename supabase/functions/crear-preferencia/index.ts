@@ -29,7 +29,8 @@ Deno.serve(async (req) => {
   try {
     const { orderId, items, customerName, customerEmail } = await req.json();
 
-    const accessToken = Deno.env.get("MP_ACCESS_TOKEN");
+    const rawAccessToken = Deno.env.get("MP_ACCESS_TOKEN");
+    const accessToken = rawAccessToken?.trim();
     if (!accessToken) {
       throw new Error("Falta configurar el secreto MP_ACCESS_TOKEN en Supabase.");
     }
@@ -71,10 +72,38 @@ Deno.serve(async (req) => {
     const datosMP = await respuestaMP.json();
 
     if (!respuestaMP.ok) {
-      console.error("Error de MercadoPago:", datosMP);
+      const mpErrorCode = datosMP?.code ?? "UNKNOWN_MP_ERROR";
+      const mpErrorMessage = datosMP?.message ?? "MercadoPago rechazó la solicitud.";
+
+      console.error("Error de MercadoPago:", {
+        status: respuestaMP.status,
+        code: mpErrorCode,
+        message: mpErrorMessage,
+        blocked_by: datosMP?.blocked_by,
+      });
+
+      // 403 con PA_UNAUTHORIZED_RESULT_FROM_POLICIES casi siempre
+      // significa credenciales válidas, pero sin permiso operativo
+      // para Checkout Pro en esa cuenta/app.
+      if (respuestaMP.status === 403 && mpErrorCode === "PA_UNAUTHORIZED_RESULT_FROM_POLICIES") {
+        return new Response(
+          JSON.stringify({
+            error: "MercadoPago bloqueó la operación por políticas de la cuenta.",
+            code: mpErrorCode,
+            details:
+              "Verifica que la app/cuenta tenga Checkout Pro habilitado y que el Access Token pertenezca al mismo entorno (TEST o PROD).",
+          }),
+          { status: 502, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        );
+      }
+
       return new Response(
-        JSON.stringify({ error: "No se pudo crear la preferencia de pago." }),
-        { status: 500, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
+        JSON.stringify({
+          error: "No se pudo crear la preferencia de pago.",
+          code: mpErrorCode,
+          details: mpErrorMessage,
+        }),
+        { status: 502, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
       );
     }
 
@@ -90,8 +119,9 @@ Deno.serve(async (req) => {
       { headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Error inesperado en crear-preferencia.";
     console.error("Error en crear-preferencia:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
     });
