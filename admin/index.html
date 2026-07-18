@@ -3,23 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel de administración — AegonPerfumes</title>
+<title>Productos — Admin AegonPerfumes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../css/design-system.css">
 </head>
 <body>
 
-<header class="admin-header">
-  <div class="admin-header__logo">AEGON<span>PERFUMES</span> · Admin</div>
-  <button class="btn btn-secondary" id="btn-cerrar-sesion">Cerrar sesión</button>
-</header>
+<header class="admin-header" id="admin-header-container"></header>
 
 <div class="container admin-content">
-  <h1 class="section__title">Panel de administración</h1>
-  <p>Sesión protegida correctamente — aquí va a vivir la gestión del catálogo (productos, variantes, fotos) en los siguientes bloques.</p>
+  <h1 class="section__title">Productos</h1>
+  <div id="admin-productos-lista" class="admin-productos-lista">
+    <p>Cargando productos...</p>
+  </div>
 </div>
 
-<script type="module" src="../js/admin/index.js"></script>
+<script type="module" src="../js/admin/productos.js"></script>
 </body>
 </html>

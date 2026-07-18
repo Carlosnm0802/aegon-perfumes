@@ -335,3 +335,23 @@ delete from products
 where name in ('YSL "Y" EDP (Decant)', 'Acqua di Gio Profondo (Decant)');
 
 alter table products drop column type;
+
+
+---Politica para darle acceso a lectura total al admin sobre sus productos
+create policy "products: lectura completa para admin"
+  on products for select
+  to authenticated
+  using (true);
+
+---el admin puede actualizar estado de los productos
+create policy "products: actualizar solo admin"
+  on products for update
+  to authenticated
+  using (true)
+  with check (true);
+  ---puede actualizar variantes
+  create policy "variants: actualizar solo admin"
+  on variants for update
+  to authenticated
+  using (true)
+  with check (true);
