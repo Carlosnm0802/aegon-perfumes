@@ -1488,3 +1488,69 @@ a:hover { color: var(--color-accent-hover); }
 .confirmacion-contenido p {
   margin-bottom: var(--space-5);
 }
+/* ============================================================
+   PANEL DE ADMINISTRACIÓN — layout base
+   ============================================================ */
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.admin-header__logo {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.05em;
+}
+
+.admin-header__logo span {
+  color: var(--color-accent);
+}
+
+.admin-content {
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-8);
+}
+
+/* ============================================================
+   LOGIN DEL ADMIN
+   ============================================================ */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+.login-card__logo {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  text-align: center;
+  margin-bottom: var(--space-1);
+}
+
+.login-card__logo span {
+  color: var(--color-accent);
+}
+
+.login-card__subtitle {
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-6);
+}
