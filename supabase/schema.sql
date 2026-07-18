@@ -355,3 +355,13 @@ create policy "products: actualizar solo admin"
   to authenticated
   using (true)
   with check (true);
+
+create policy "product-images: admin sube"
+  on storage.objects for insert
+  to authenticated
+  with check (bucket_id = 'product-images');
+create policy "product-images: admin actualiza"
+  on storage.objects for update
+  to authenticated
+  using (bucket_id = 'product-images')
+  with check (bucket_id = 'product-images');

@@ -1,7 +1,7 @@
 import { supabaseClient } from '../supabase-client.js';
 import { requireAuth, cerrarSesion } from './auth-guard.js';
 import { renderAdminHeader } from './admin-header.js';
-import { renderProductoAdminCard, activarProductoAdminCard } from './product-editor.js';
+import { renderProductoAdminCard, activarProductoAdminCard, activarSubidaDeImagen } from './product-editor.js';
 
 async function cargarProductos() {
   const contenedor = document.getElementById('admin-productos-lista');
@@ -26,7 +26,10 @@ async function cargarProductos() {
   }
 
   contenedor.innerHTML = productos.map(renderProductoAdminCard).join('');
-  contenedor.querySelectorAll('.admin-product-card').forEach(activarProductoAdminCard);
+  contenedor.querySelectorAll('.admin-product-card').forEach(card => {
+    activarProductoAdminCard(card);
+    activarSubidaDeImagen(card);
+  });
 }
 
 async function iniciar() {

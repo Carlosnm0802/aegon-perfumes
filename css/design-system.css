@@ -1688,3 +1688,34 @@ a:hover { color: var(--color-accent-hover); }
   font-size: var(--fs-sm);
   color: var(--color-text-secondary);
 }
+/* ============================================================
+   SUBIDA DE IMAGEN (ADMIN)
+   ============================================================ */
+
+.admin-product-card__image-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.admin-product-card__thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface-raised);
+}
+
+.admin-product-card__upload-label {
+  font-size: 10px;
+  color: var(--color-accent);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.admin-product-card__upload-label:hover {
+  color: var(--color-accent-hover);
+}

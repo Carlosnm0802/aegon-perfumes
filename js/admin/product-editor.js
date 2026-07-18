@@ -25,7 +25,13 @@ export function renderProductoAdminCard(producto) {
   return `
     <div class="admin-product-card" data-product-id="${producto.id}">
       <div class="admin-product-card__header">
-        <img src="${producto.image_url}" alt="${producto.name}" width="56" height="56">
+        <div class="admin-product-card__image-wrap">
+          <img src="${producto.image_url}" alt="${producto.name}" width="56" height="56" class="admin-product-card__thumb">
+          <label class="admin-product-card__upload-label">
+            Cambiar foto
+            <input type="file" accept="image/*" class="admin-product-card__file-input" hidden>
+          </label>
+        </div>
         <div class="admin-product-card__info">
           <div class="admin-product-card__brand">${producto.brand?.name ?? ''}</div>
           <div class="admin-product-card__name">${producto.name}</div>
@@ -93,6 +99,67 @@ export function activarProductoAdminCard(card) {
     } finally {
       btnGuardar.disabled = false;
       btnGuardar.textContent = 'Guardar cambios';
+    }
+  });
+}
+
+// ============================================================
+// SUBIDA DE IMAGEN
+// ============================================================
+// Independiente del botón "Guardar cambios" — al elegir un
+// archivo, se sube de inmediato y se actualiza image_url. No
+// tiene sentido hacer esperar al usuario a que guarde el resto
+// del formulario para algo que ya seleccionó y quiere subir ya.
+// ============================================================
+
+export function activarSubidaDeImagen(card) {
+  const productId = card.dataset.productId;
+  const fileInput = card.querySelector('.admin-product-card__file-input');
+  const thumb = card.querySelector('.admin-product-card__thumb');
+  const uploadLabel = card.querySelector('.admin-product-card__upload-label');
+  const textoOriginal = uploadLabel.firstChild.textContent;
+
+  fileInput.addEventListener('change', async () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    uploadLabel.firstChild.textContent = 'Subiendo...';
+    fileInput.disabled = true;
+
+    try {
+      // Conservamos la extensión real del archivo — Supabase
+      // Storage sirve archivos sin extensión como
+      // binary/octet-stream, lo que rompe la vista previa.
+      const extension = file.name.split('.').pop();
+      const nombreArchivo = `${productId}-${Date.now()}.${extension}`;
+
+      const { error: errorSubida } = await supabaseClient.storage
+        .from('product-images')
+        .upload(nombreArchivo, file, { upsert: true });
+
+      if (errorSubida) throw errorSubida;
+
+      const { data: urlData } = supabaseClient.storage
+        .from('product-images')
+        .getPublicUrl(nombreArchivo);
+
+      const { error: errorProducto } = await supabaseClient
+        .from('products')
+        .update({ image_url: urlData.publicUrl })
+        .eq('id', productId);
+
+      if (errorProducto) throw errorProducto;
+
+      thumb.src = urlData.publicUrl;
+      uploadLabel.firstChild.textContent = '✓ Actualizada';
+      setTimeout(() => { uploadLabel.firstChild.textContent = textoOriginal; }, 1500);
+    } catch (error) {
+      console.error('Error subiendo la imagen:', error);
+      uploadLabel.firstChild.textContent = 'Error al subir';
+      setTimeout(() => { uploadLabel.firstChild.textContent = textoOriginal; }, 2000);
+    } finally {
+      fileInput.disabled = false;
+      fileInput.value = ''; // permite volver a seleccionar el mismo archivo
     }
   });
 }
