@@ -19,6 +19,7 @@ export function renderAdminHeader(seccionActiva) {
     <nav class="admin-nav">
       ${link('index.html', 'Productos', 'productos')}
       ${link('nuevo-producto.html', 'Nuevo producto', 'nuevo-producto')}
+      ${link('pedidos.html', 'Pedidos', 'pedidos')}
     </nav>
     <button class="btn btn-secondary" id="btn-cerrar-sesion">Cerrar sesión</button>
   `;

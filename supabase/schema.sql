@@ -374,3 +374,17 @@ create policy "variants: insertar solo admin"
   on variants for insert
   to authenticated
   with check (true);
+
+create policy "orders: lectura solo admin"
+  on orders for select
+  to authenticated
+  using (true);
+create policy "orders: actualizar solo admin"
+  on orders for update
+  to authenticated
+  using (true)
+  with check (true);
+create policy "order_items: lectura solo admin"
+  on order_items for select
+  to authenticated
+  using (true);

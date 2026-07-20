@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<div class="container admin-content">
+  <h1 class="section__title">Pedidos</h1>
+
+  <div class="filter-pills admin-pedidos-filtro" data-filter-group="estado-pedido">
+    <button class="filter-pill" data-value="" aria-pressed="true">Todos</button>
+    <button class="filter-pill" data-value="pendiente" aria-pressed="false">Pendiente</button>
+    <button class="filter-pill" data-value="preparando" aria-pressed="false">Preparando</button>
+    <button class="filter-pill" data-value="enviado" aria-pressed="false">Enviado</button>
+    <button class="filter-pill" data-value="entregado" aria-pressed="false">Entregado</button>
+  </div>
+
+  <div id="admin-pedidos-lista" class="admin-pedidos-lista">
+    <p>Cargando pedidos...</p>
+  </div>
+</div>
+
+<script type="module" src="../js/admin/pedidos.js"></script>
+</body>
+</html>
