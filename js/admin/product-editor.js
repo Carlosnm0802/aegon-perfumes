@@ -10,6 +10,24 @@ import { supabaseClient } from '../supabase-client.js';
 // tiene que guardar cada campo por separado.
 // ============================================================
 
+function renderNuevaVariantRow() {
+  return `
+    <div class="admin-variant-row admin-variant-row--nueva" data-variant-id="">
+      <input type="text" placeholder="Tamaño (ej. 15ml)" class="admin-variant-row__size" data-field="size_label">
+      <select class="admin-variant-row__type" data-field="type">
+        <option value="decant">Decant</option>
+        <option value="completo">Completo</option>
+      </select>
+      <input type="number" step="0.01" min="0" placeholder="Precio" class="admin-variant-row__price" data-field="price">
+      <label class="admin-variant-row__available">
+        <input type="checkbox" data-field="available" checked>
+        Disponible
+      </label>
+      <button type="button" class="admin-variant-row__quitar" aria-label="Quitar">✕</button>
+    </div>
+  `;
+}
+
 export function renderProductoAdminCard(producto) {
   const variantesHtml = producto.variants.map(v => `
     <div class="admin-variant-row" data-variant-id="${v.id}">
@@ -46,6 +64,7 @@ export function renderProductoAdminCard(producto) {
       <div class="admin-product-card__variants">
         ${variantesHtml}
       </div>
+      <button type="button" class="btn btn-secondary admin-product-card__agregar-variante">+ Agregar variante</button>
 
       <div class="admin-product-card__footer">
         <span class="admin-product-card__status" hidden></span>
@@ -58,8 +77,21 @@ export function renderProductoAdminCard(producto) {
 export function activarProductoAdminCard(card) {
   const productId = card.dataset.productId;
   const btnGuardar = card.querySelector('.admin-product-card__guardar');
+  const btnAgregarVariante = card.querySelector('.admin-product-card__agregar-variante');
+  const contenedorVariantes = card.querySelector('.admin-product-card__variants');
   const statusEl = card.querySelector('.admin-product-card__status');
   const checkboxActivo = card.querySelector('.admin-product-card__active-checkbox');
+
+  btnAgregarVariante.addEventListener('click', () => {
+    contenedorVariantes.insertAdjacentHTML('beforeend', renderNuevaVariantRow());
+    const nuevaFila = contenedorVariantes.lastElementChild;
+    // Solo las filas nuevas (aún no guardadas) se pueden quitar
+    // libremente del formulario — no existen en la base de datos
+    // todavía, así que no hay ningún riesgo de romper un historial.
+    nuevaFila.querySelector('.admin-variant-row__quitar').addEventListener('click', () => {
+      nuevaFila.remove();
+    });
+  });
 
   btnGuardar.addEventListener('click', async () => {
     btnGuardar.disabled = true;
@@ -74,10 +106,9 @@ export function activarProductoAdminCard(card) {
 
       if (errorProducto) throw errorProducto;
 
-      // Actualiza cada variante por separado — RLS ya permite esto
-      // porque la sesión está autenticada (política del Bloque 9B).
-      const filasVariantes = card.querySelectorAll('.admin-variant-row');
-      for (const fila of filasVariantes) {
+      // Variantes que ya existían — se actualizan (precio/disponible).
+      const filasExistentes = card.querySelectorAll('.admin-variant-row:not(.admin-variant-row--nueva)');
+      for (const fila of filasExistentes) {
         const variantId = fila.dataset.variantId;
         const price = Number(fila.querySelector('[data-field="price"]').value);
         const available = fila.querySelector('[data-field="available"]').checked;
@@ -90,13 +121,42 @@ export function activarProductoAdminCard(card) {
         if (errorVariante) throw errorVariante;
       }
 
+      // Variantes agregadas con "+ Agregar variante" en esta
+      // sesión — se insertan todas juntas, solo las que tengan
+      // tamaño y precio válidos (evita crear filas vacías).
+      const filasNuevas = card.querySelectorAll('.admin-variant-row--nueva');
+      const nuevasAInsertar = [];
+      filasNuevas.forEach(fila => {
+        const size_label = fila.querySelector('[data-field="size_label"]').value.trim();
+        const price = Number(fila.querySelector('[data-field="price"]').value);
+        const type = fila.querySelector('[data-field="type"]').value;
+        const available = fila.querySelector('[data-field="available"]').checked;
+
+        if (size_label && price > 0) {
+          nuevasAInsertar.push({ product_id: productId, size_label, price, type, available });
+        }
+      });
+
+      if (nuevasAInsertar.length > 0) {
+        const { error: errorInsertar } = await supabaseClient
+          .from('variants')
+          .insert(nuevasAInsertar);
+
+        if (errorInsertar) throw errorInsertar;
+      }
+
       statusEl.textContent = '✓ Guardado';
       statusEl.hidden = false;
+
+      // Recargamos la página para que las variantes recién creadas
+      // pasen a ser "existentes" con su id real de la base de datos
+      // — evita insertarlas por duplicado si se presiona Guardar
+      // de nuevo sin recargar.
+      setTimeout(() => window.location.reload(), 700);
     } catch (error) {
       console.error('Error guardando producto:', error);
       statusEl.textContent = 'Error al guardar. Intenta de nuevo.';
       statusEl.hidden = false;
-    } finally {
       btnGuardar.disabled = false;
       btnGuardar.textContent = 'Guardar cambios';
     }

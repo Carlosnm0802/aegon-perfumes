@@ -1900,3 +1900,46 @@ a:hover { color: var(--color-accent-hover); }
   font-size: var(--fs-sm);
   color: var(--color-text-secondary);
 }
+/* ============================================================
+   FILA DE VARIANTE NUEVA (dentro de una tarjeta existente)
+   ============================================================ */
+
+.admin-variant-row--nueva {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr auto auto;
+  gap: var(--space-2);
+}
+
+.admin-variant-row__size,
+.admin-variant-row__type {
+  padding: var(--space-2);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  width: 100%;
+}
+
+.admin-variant-row__quitar {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: var(--fs-sm);
+}
+
+.admin-variant-row__quitar:hover {
+  color: #E58F8F;
+}
+
+.admin-product-card__agregar-variante {
+  margin-bottom: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .admin-variant-row--nueva {
+    grid-template-columns: 1fr 1fr;
+  }
+}
