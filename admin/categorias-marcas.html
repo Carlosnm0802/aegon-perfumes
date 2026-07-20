@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Categorías y marcas — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<div class="container admin-content">
+  <h1 class="section__title">Categorías y marcas</h1>
+
+  <div class="admin-cat-marca-grid">
+
+    <section class="admin-panel-section">
+      <h2 class="admin-form__subtitle">Categorías</h2>
+      <ul id="lista-categorias" class="admin-simple-list"><li>Cargando...</li></ul>
+      <form id="form-nueva-categoria" class="admin-inline-form">
+        <input type="text" id="input-nueva-categoria" placeholder="Nombre de la categoría" required>
+        <button type="submit" class="btn btn-secondary">Agregar</button>
+      </form>
+      <div id="error-categoria" class="checkout-error" hidden></div>
+    </section>
+
+    <section class="admin-panel-section">
+      <h2 class="admin-form__subtitle">Marcas</h2>
+      <ul id="lista-marcas" class="admin-simple-list"><li>Cargando...</li></ul>
+      <form id="form-nueva-marca" class="admin-inline-form">
+        <input type="text" id="input-nueva-marca" placeholder="Nombre de la marca" required>
+        <button type="submit" class="btn btn-secondary">Agregar</button>
+      </form>
+      <div id="error-marca" class="checkout-error" hidden></div>
+    </section>
+
+  </div>
+</div>
+
+<script type="module" src="../js/admin/categorias-marcas.js"></script>
+</body>
+</html>

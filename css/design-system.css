@@ -1943,3 +1943,59 @@ a:hover { color: var(--color-accent-hover); }
     grid-template-columns: 1fr 1fr;
   }
 }
+/* ============================================================
+   CATEGORÍAS Y MARCAS (ADMIN)
+   ============================================================ */
+
+.admin-cat-marca-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+@media (max-width: 640px) {
+  .admin-cat-marca-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-panel-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.admin-simple-list {
+  list-style: none;
+  margin: 0 0 var(--space-5) 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.admin-simple-list li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--fs-sm);
+}
+
+.admin-slug {
+  color: var(--color-text-secondary);
+  font-size: var(--fs-xs);
+}
+
+.admin-inline-form {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.admin-inline-form input {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+}

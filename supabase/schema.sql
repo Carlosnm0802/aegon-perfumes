@@ -388,3 +388,13 @@ create policy "order_items: lectura solo admin"
   on order_items for select
   to authenticated
   using (true);
+
+create policy "categories: insertar solo admin"
+  on categories for insert
+  to authenticated
+  with check (true);
+
+create policy "brands: insertar solo admin"
+  on brands for insert
+  to authenticated
+  with check (true);
