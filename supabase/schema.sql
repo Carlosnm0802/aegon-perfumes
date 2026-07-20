@@ -365,3 +365,12 @@ create policy "product-images: admin actualiza"
   to authenticated
   using (bucket_id = 'product-images')
   with check (bucket_id = 'product-images');
+
+create policy "products: insertar solo admin"
+  on products for insert
+  to authenticated
+  with check (true);
+create policy "variants: insertar solo admin"
+  on variants for insert
+  to authenticated
+  with check (true);

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuevo producto — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<div class="container admin-content">
+  <h1 class="section__title">Nuevo producto</h1>
+
+  <form id="nuevo-producto-form" class="admin-form">
+
+    <div class="form-field">
+      <label for="input-nombre">Nombre del perfume</label>
+      <input type="text" id="input-nombre" required>
+    </div>
+
+    <div class="form-field">
+      <label for="input-descripcion">Descripción</label>
+      <textarea id="input-descripcion" rows="3"></textarea>
+    </div>
+
+    <div class="admin-form__row">
+      <div class="form-field">
+        <label for="input-genero">Género</label>
+        <select id="input-genero" required>
+          <option value="hombre">Hombre</option>
+          <option value="mujer">Mujer</option>
+          <option value="unisex">Unisex</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label for="input-categoria">Categoría</label>
+        <select id="input-categoria" required></select>
+      </div>
+
+      <div class="form-field">
+        <label for="input-marca">Marca</label>
+        <select id="input-marca" required></select>
+      </div>
+    </div>
+
+    <div class="form-field">
+      <label for="input-foto">Foto (opcional — puedes subirla después)</label>
+      <input type="file" id="input-foto" accept="image/*">
+    </div>
+
+    <hr class="divider-gold">
+
+    <h2 class="admin-form__subtitle">Variantes (tamaños y precios)</h2>
+    <div id="variantes-container"></div>
+    <button type="button" class="btn btn-secondary" id="btn-agregar-variante">+ Agregar variante</button>
+
+    <hr class="divider-gold">
+
+    <div id="nuevo-producto-error" class="checkout-error" hidden></div>
+
+    <button type="submit" class="btn btn-primary" id="btn-crear-producto" style="width:100%;">Crear producto</button>
+  </form>
+</div>
+
+<script type="module" src="../js/admin/nuevo-producto.js"></script>
+</body>
+</html>

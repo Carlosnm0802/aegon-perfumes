@@ -1719,3 +1719,86 @@ a:hover { color: var(--color-accent-hover); }
 .admin-product-card__upload-label:hover {
   color: var(--color-accent-hover);
 }
+/* ============================================================
+   FORMULARIO DE NUEVO PRODUCTO
+   ============================================================ */
+
+.admin-form {
+  max-width: 640px;
+}
+
+.admin-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .admin-form__row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-form textarea {
+  width: 100%;
+  padding: var(--space-3);
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  resize: vertical;
+}
+
+.admin-form__subtitle {
+  font-size: var(--fs-md);
+  margin-bottom: var(--space-4);
+}
+
+.admin-variant-form-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr auto auto;
+  gap: var(--space-2);
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.admin-variant-form-row input[type="text"],
+.admin-variant-form-row input[type="number"],
+.admin-variant-form-row select {
+  padding: var(--space-2);
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+  width: 100%;
+}
+
+.variante-available {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+}
+
+.variante-quitar {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: var(--fs-sm);
+}
+
+.variante-quitar:hover {
+  color: #E58F8F;
+}
+
+@media (max-width: 640px) {
+  .admin-variant-form-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

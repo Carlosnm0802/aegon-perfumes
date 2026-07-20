@@ -18,6 +18,7 @@ export function renderAdminHeader(seccionActiva) {
     <div class="admin-header__logo">AEGON<span>PERFUMES</span> · Admin</div>
     <nav class="admin-nav">
       ${link('index.html', 'Productos', 'productos')}
+      ${link('nuevo-producto.html', 'Nuevo producto', 'nuevo-producto')}
     </nav>
     <button class="btn btn-secondary" id="btn-cerrar-sesion">Cerrar sesión</button>
   `;
