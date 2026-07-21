@@ -40,8 +40,10 @@ export function renderProductoAdminCard(producto) {
     </div>
   `).join('');
 
+  const textoBusqueda = `${producto.name} ${producto.brand?.name ?? ''} ${producto.category?.name ?? ''}`.toLowerCase();
+
   return `
-    <div class="admin-product-card" data-product-id="${producto.id}">
+    <div class="admin-product-card" data-product-id="${producto.id}" data-search="${textoBusqueda}">
       <div class="admin-product-card__header">
         <div class="admin-product-card__image-wrap">
           <img src="${producto.image_url}" alt="${producto.name}" width="56" height="56" class="admin-product-card__thumb">

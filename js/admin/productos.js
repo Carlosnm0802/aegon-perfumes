@@ -32,6 +32,21 @@ async function cargarProductos() {
   });
 }
 
+// Filtra las tarjetas ya renderizadas en el DOM — no hace ninguna
+// consulta nueva a Supabase, por eso es instantáneo mientras se
+// escribe. Funciona sobre lo que ya está cargado en pantalla.
+function activarBusqueda() {
+  const input = document.getElementById('admin-buscar-producto');
+  if (!input) return;
+
+  input.addEventListener('input', () => {
+    const termino = input.value.trim().toLowerCase();
+    document.querySelectorAll('.admin-product-card').forEach(card => {
+      card.hidden = !card.dataset.search.includes(termino);
+    });
+  });
+}
+
 async function iniciar() {
   const session = await requireAuth();
   if (!session) return; // ya fue redirigido a login.html
@@ -39,6 +54,7 @@ async function iniciar() {
   document.getElementById('admin-header-container').innerHTML = renderAdminHeader('productos');
   document.getElementById('btn-cerrar-sesion').addEventListener('click', cerrarSesion);
 
+  activarBusqueda();
   cargarProductos();
 }
 
