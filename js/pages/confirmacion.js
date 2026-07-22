@@ -19,7 +19,7 @@ function renderBotonWhatsApp(mensaje) {
 }
 
 async function iniciarConfirmacion() {
-  renderLayout();
+  await renderLayout();
 
   const contenedor = document.getElementById('confirmacion-contenido');
   const params = new URLSearchParams(window.location.search);

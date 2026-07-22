@@ -116,7 +116,7 @@ async function guardarPedido(datosCliente, carrito) {
 // INICIALIZACIÓN
 // ============================================================
 async function iniciarCheckout() {
-  renderLayout();
+  await renderLayout();
 
   const carrito = obtenerCarrito();
 

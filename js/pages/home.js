@@ -21,7 +21,7 @@ async function cargarMasVendidos() {
     .select(`
       id, name, image_url,
       brand:brands(name),
-      variants(id, size_label, price, available, type)
+      variants(id, size_label, price, available)
     `)
     .order('created_at', { ascending: false })
     .limit(4);
@@ -35,7 +35,7 @@ async function cargarMasVendidos() {
   grid.querySelectorAll('.product-card').forEach(activarSelectorDeVariante);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  renderLayout();
-  cargarMasVendidos();
+document.addEventListener('DOMContentLoaded', async () => {
+  await renderLayout();
+  await cargarMasVendidos();
 });

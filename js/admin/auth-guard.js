@@ -18,23 +18,31 @@ import { supabaseClient } from '../supabase-client.js';
 // ============================================================
 
 export async function requireAuth() {
-  const { data: { session } } = await supabaseClient.auth.getSession();
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
 
-  if (!session) {
-    window.location.href = 'login.html';
+    if (!session) {
+      const currentPath = window.location.pathname.split('/').pop();
+      if (currentPath !== 'login.html') {
+        window.location.href = 'login.html';
+      }
+      return null;
+    }
+
+    // Si la sesión termina mientras el usuario sigue en la página
+    // (por ejemplo, cerró sesión en otra pestaña), lo mandamos al
+    // login en vez de dejarlo con una pantalla que ya no debería ver.
+    supabaseClient.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') {
+        window.location.href = 'login.html';
+      }
+    });
+
+    return session;
+  } catch (error) {
+    console.error('Error verificando sesión:', error);
     return null;
   }
-
-  // Si la sesión termina mientras el usuario sigue en la página
-  // (por ejemplo, cerró sesión en otra pestaña), lo mandamos al
-  // login en vez de dejarlo con una pantalla que ya no debería ver.
-  supabaseClient.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_OUT') {
-      window.location.href = 'login.html';
-    }
-  });
-
-  return session;
 }
 
 export async function cerrarSesion() {

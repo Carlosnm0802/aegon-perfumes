@@ -14,10 +14,6 @@ function renderNuevaVariantRow() {
   return `
     <div class="admin-variant-row admin-variant-row--nueva" data-variant-id="">
       <input type="text" placeholder="Tamaño (ej. 15ml)" class="admin-variant-row__size" data-field="size_label">
-      <select class="admin-variant-row__type" data-field="type">
-        <option value="decant">Decant</option>
-        <option value="completo">Completo</option>
-      </select>
       <input type="number" step="0.01" min="0" placeholder="Precio" class="admin-variant-row__price" data-field="price">
       <label class="admin-variant-row__available">
         <input type="checkbox" data-field="available" checked>
@@ -31,7 +27,7 @@ function renderNuevaVariantRow() {
 export function renderProductoAdminCard(producto) {
   const variantesHtml = producto.variants.map(v => `
     <div class="admin-variant-row" data-variant-id="${v.id}">
-      <span class="admin-variant-row__label">${v.size_label} · ${v.type === 'decant' ? 'Decant' : 'Completo'}</span>
+      <span class="admin-variant-row__label">${v.size_label}</span>
       <input type="number" step="0.01" min="0" class="admin-variant-row__price" value="${v.price}" data-field="price">
       <label class="admin-variant-row__available">
         <input type="checkbox" data-field="available" ${v.available ? 'checked' : ''}>
@@ -131,11 +127,10 @@ export function activarProductoAdminCard(card) {
       filasNuevas.forEach(fila => {
         const size_label = fila.querySelector('[data-field="size_label"]').value.trim();
         const price = Number(fila.querySelector('[data-field="price"]').value);
-        const type = fila.querySelector('[data-field="type"]').value;
         const available = fila.querySelector('[data-field="available"]').checked;
 
         if (size_label && price > 0) {
-          nuevasAInsertar.push({ product_id: productId, size_label, price, type, available });
+          nuevasAInsertar.push({ product_id: productId, size_label, price, available });
         }
       });
 

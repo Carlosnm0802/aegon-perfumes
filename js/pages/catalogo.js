@@ -101,7 +101,7 @@ function construirConsulta() {
       id, name, image_url,
       brand:brands!inner(name, slug),
       category:categories!inner(name, slug),
-      variants!inner(id, size_label, price, available, type)
+      variants!inner(id, size_label, price, available)
     `)
     .order('created_at', { ascending: false });
 
@@ -110,9 +110,6 @@ function construirConsulta() {
   }
   if (filtros.marcas.length > 0) {
     query = query.in('brand.slug', filtros.marcas);
-  }
-  if (filtros.tipo) {
-    query = query.eq('variants.type', filtros.tipo);
   }
   const rango = parsearRangoPrecio(filtros.precio);
   if (rango) {
@@ -248,7 +245,7 @@ function limpiarPanel() {
 // INICIALIZACIÓN
 // ============================================================
 async function iniciarCatalogo() {
-  renderLayout();
+  await renderLayout();
 
   const { categorias, marcas } = await cargarOpcionesDeFiltro();
   document.getElementById('filter-panel-container').innerHTML = renderFilterPanel(categorias, marcas);

@@ -398,3 +398,21 @@ create policy "brands: insertar solo admin"
   on brands for insert
   to authenticated
   with check (true);
+
+create table settings (
+  id uuid primary key default gen_random_uuid(),
+  whatsapp_number text not null default '521234567890'
+);
+
+alter table settings enable row level security;
+create policy "settings: lectura pública"
+  on settings for select
+  using (true);
+
+create policy "settings: actualizar solo admin"
+  on settings for update
+  to authenticated
+  using (true)
+  with check (true);
+
+insert into settings (whatsapp_number) values ('521234567890');

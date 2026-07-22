@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<div class="container admin-content">
+  <h1 class="section__title">Dashboard</h1>
+
+  <div class="admin-metricas-grid">
+    <div class="admin-metrica-card">
+      <div class="admin-metrica-card__label">Ventas totales</div>
+      <div class="admin-metrica-card__valor" id="metrica-ventas-totales">—</div>
+    </div>
+    <div class="admin-metrica-card">
+      <div class="admin-metrica-card__label">Pedidos pagados</div>
+      <div class="admin-metrica-card__valor" id="metrica-numero-pedidos">—</div>
+    </div>
+    <div class="admin-metrica-card">
+      <div class="admin-metrica-card__label">Ticket promedio</div>
+      <div class="admin-metrica-card__valor" id="metrica-ticket-promedio">—</div>
+    </div>
+    <div class="admin-metrica-card">
+      <div class="admin-metrica-card__label">Pendientes de pago</div>
+      <div class="admin-metrica-card__valor" id="metrica-pendientes">—</div>
+    </div>
+  </div>
+
+  <div class="admin-graficas-grid">
+    <div class="admin-grafica-card">
+      <h2 class="admin-form__subtitle">Ventas — últimos 14 días</h2>
+      <canvas id="grafica-ventas"></canvas>
+    </div>
+    <div class="admin-grafica-card">
+      <h2 class="admin-form__subtitle">Productos más vendidos</h2>
+      <canvas id="grafica-productos"></canvas>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="../js/admin/dashboard.js"></script>
+</body>
+</html>

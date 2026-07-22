@@ -12,12 +12,13 @@ import { agregarAlCarrito } from '../cart.js';
 export function renderProductCard(product) {
   const variantes = [...product.variants].sort((a, b) => a.price - b.price);
   const primera = variantes[0];
+  const tipoProducto = 'completo';
 
   const pills = variantes.map((v, i) => `
     <button class="variant-pill"
             data-variant-id="${v.id}"
             data-price="${v.price}"
-            data-type="${v.type}"
+            data-type="${tipoProducto}"
             aria-pressed="${i === 0}"
             ${!v.available ? 'disabled' : ''}>
       ${v.size_label}
@@ -34,7 +35,7 @@ export function renderProductCard(product) {
       <div class="product-card__body">
         <div class="product-card__brand">${product.brand?.name ?? ''}</div>
         <div class="product-card__name">${product.name}</div>
-        <div class="product-card__badges">${renderBadge(primera?.type)}</div>
+        <div class="product-card__badges">${renderBadge(tipoProducto)}</div>
         <div class="variant-selector">${pills}</div>
         <div class="product-card__price">${precioInicial}</div>
         <button class="btn btn-primary" style="width:100%;">Agregar al carrito</button>

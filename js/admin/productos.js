@@ -5,31 +5,41 @@ import { renderProductoAdminCard, activarProductoAdminCard, activarSubidaDeImage
 
 async function cargarProductos() {
   const contenedor = document.getElementById('admin-productos-lista');
+  if (!contenedor) return;
 
-  // A diferencia del catálogo público, aquí SÍ traemos productos
-  // inactivos — la política de RLS para administradores
-  // autenticados lo permite (Bloque 9B).
-  const { data: productos, error } = await supabaseClient
-    .from('products')
-    .select(`
-      id, name, image_url, is_active,
-      brand:brands(name),
-      category:categories(name),
-      variants(id, size_label, price, available, type)
-    `)
-    .order('created_at', { ascending: false });
+  contenedor.innerHTML = '<p>Cargando productos...</p>';
 
-  if (error) {
-    console.error('Error cargando productos:', error);
+  try {
+    const { data: productos, error } = await supabaseClient
+      .from('products')
+      .select(`
+        id, name, image_url, is_active,
+        brand:brands(name),
+        category:categories(name),
+        variants(id, size_label, price, available)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error cargando productos:', error);
+      contenedor.innerHTML = '<p>No pudimos cargar los productos.</p>';
+      return;
+    }
+
+    if (!productos || productos.length === 0) {
+      contenedor.innerHTML = '<p>No hay productos registrados.</p>';
+      return;
+    }
+
+    contenedor.innerHTML = productos.map(renderProductoAdminCard).join('');
+    contenedor.querySelectorAll('.admin-product-card').forEach(card => {
+      activarProductoAdminCard(card);
+      activarSubidaDeImagen(card);
+    });
+  } catch (error) {
+    console.error('Error inesperado cargando productos:', error);
     contenedor.innerHTML = '<p>No pudimos cargar los productos.</p>';
-    return;
   }
-
-  contenedor.innerHTML = productos.map(renderProductoAdminCard).join('');
-  contenedor.querySelectorAll('.admin-product-card').forEach(card => {
-    activarProductoAdminCard(card);
-    activarSubidaDeImagen(card);
-  });
 }
 
 // Filtra las tarjetas ya renderizadas en el DOM — no hace ninguna

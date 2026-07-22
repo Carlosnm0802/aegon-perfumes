@@ -17,6 +17,7 @@ export function renderAdminHeader(seccionActiva) {
   return `
     <div class="admin-header__logo">AEGON<span>PERFUMES</span> · Admin</div>
     <nav class="admin-nav">
+      ${link('dashboard.html', 'Dashboard', 'dashboard')}
       ${link('index.html', 'Productos', 'productos')}
       ${link('nuevo-producto.html', 'Nuevo producto', 'nuevo-producto')}
       ${link('pedidos.html', 'Pedidos', 'pedidos')}

@@ -50,11 +50,10 @@ function leerVariantesDelFormulario() {
   filas.forEach(fila => {
     const size_label = fila.querySelector('.variante-size-label').value.trim();
     const price = Number(fila.querySelector('.variante-price').value);
-    const type = fila.querySelector('.variante-type').value;
     const available = fila.querySelector('.variante-available input').checked;
 
     if (size_label && price > 0) {
-      variantes.push({ size_label, price, type, available });
+      variantes.push({ size_label, price, available });
     }
   });
 
