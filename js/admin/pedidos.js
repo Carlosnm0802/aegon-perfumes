@@ -1,6 +1,6 @@
 import { supabaseClient } from '../supabase-client.js';
 import { requireAuth, cerrarSesion } from './auth-guard.js';
-import { renderAdminHeader } from './admin-header.js';
+import { renderAdminHeader, activarAdminHeader } from './admin-header.js';
 
 const ETIQUETAS_ENTREGA = {
   local: 'Recoger en persona',
@@ -168,6 +168,7 @@ async function iniciar() {
   if (!session) return;
 
   document.getElementById('admin-header-container').innerHTML = renderAdminHeader('pedidos');
+  activarAdminHeader();
   document.getElementById('btn-cerrar-sesion').addEventListener('click', cerrarSesion);
 
   activarFiltro();

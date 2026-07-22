@@ -365,6 +365,10 @@ create policy "product-images: admin actualiza"
   to authenticated
   using (bucket_id = 'product-images')
   with check (bucket_id = 'product-images');
+create policy "product-images: admin borra"
+  on storage.objects for delete
+  to authenticated
+  using (bucket_id = 'product-images');
 
 create policy "products: insertar solo admin"
   on products for insert

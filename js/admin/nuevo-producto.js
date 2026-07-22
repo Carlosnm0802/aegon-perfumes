@@ -1,6 +1,6 @@
 import { supabaseClient } from '../supabase-client.js';
 import { requireAuth, cerrarSesion } from './auth-guard.js';
-import { renderAdminHeader } from './admin-header.js';
+import { renderAdminHeader, activarAdminHeader } from './admin-header.js';
 
 let contadorVariantes = 0;
 
@@ -148,6 +148,7 @@ async function iniciar() {
   if (!session) return;
 
   document.getElementById('admin-header-container').innerHTML = renderAdminHeader('nuevo-producto');
+  activarAdminHeader();
   document.getElementById('btn-cerrar-sesion').addEventListener('click', cerrarSesion);
 
   await cargarOpciones();

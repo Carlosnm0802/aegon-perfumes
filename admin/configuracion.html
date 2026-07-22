@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<div class="container admin-content">
+  <h1 class="section__title">Configuración</h1>
+
+  <form id="form-configuracion" class="admin-form">
+    <div class="form-field">
+      <label for="input-whatsapp">Número de WhatsApp del negocio</label>
+      <input type="tel" id="input-whatsapp" placeholder="521234567890">
+      <p class="admin-form__ayuda">Con código de país, sin espacios ni símbolos — ej. 521234567890 (52 = México, luego el número a 10 dígitos).</p>
+    </div>
+
+    <span id="configuracion-status" class="admin-form__status" hidden></span>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+  </form>
+</div>
+
+<script type="module" src="../js/admin/configuracion.js"></script>
+</body>
+</html>

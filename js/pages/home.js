@@ -21,7 +21,7 @@ async function cargarMasVendidos() {
     .select(`
       id, name, image_url,
       brand:brands(name),
-      variants(id, size_label, price, available)
+      variants(id, size_label, price, available, type)
     `)
     .order('created_at', { ascending: false })
     .limit(4);
@@ -37,5 +37,5 @@ async function cargarMasVendidos() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   await renderLayout();
-  await cargarMasVendidos();
+  cargarMasVendidos();
 });

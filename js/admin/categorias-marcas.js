@@ -1,6 +1,6 @@
 import { supabaseClient } from '../supabase-client.js';
 import { requireAuth, cerrarSesion } from './auth-guard.js';
-import { renderAdminHeader } from './admin-header.js';
+import { renderAdminHeader, activarAdminHeader } from './admin-header.js';
 
 // Convierte "Xerjoff" en "xerjoff", "Yves Saint Laurent" en
 // "yves-saint-laurent" — mismo formato que ya usan tus slugs
@@ -101,6 +101,7 @@ async function iniciar() {
   if (!session) return;
 
   document.getElementById('admin-header-container').innerHTML = renderAdminHeader('categorias-marcas');
+  activarAdminHeader();
   document.getElementById('btn-cerrar-sesion').addEventListener('click', cerrarSesion);
 
   activarFormularioCategoria();

@@ -14,6 +14,10 @@ function renderNuevaVariantRow() {
   return `
     <div class="admin-variant-row admin-variant-row--nueva" data-variant-id="">
       <input type="text" placeholder="Tamaño (ej. 15ml)" class="admin-variant-row__size" data-field="size_label">
+      <select class="admin-variant-row__type" data-field="type">
+        <option value="decant">Decant</option>
+        <option value="completo">Completo</option>
+      </select>
       <input type="number" step="0.01" min="0" placeholder="Precio" class="admin-variant-row__price" data-field="price">
       <label class="admin-variant-row__available">
         <input type="checkbox" data-field="available" checked>
@@ -24,10 +28,39 @@ function renderNuevaVariantRow() {
   `;
 }
 
-export function renderProductoAdminCard(producto) {
+function renderOpciones(items, selectedId) {
+  return (items ?? []).map(item => `
+    <option value="${item.id}" ${item.id === selectedId ? 'selected' : ''}>${item.name}</option>
+  `).join('');
+}
+
+function extraerRutaPublicaProductImages(url) {
+  if (!url) return null;
+
+  try {
+    const parsedUrl = new URL(url);
+    const prefijo = '/storage/v1/object/public/product-images/';
+    const index = parsedUrl.pathname.indexOf(prefijo);
+    if (index === -1) return null;
+
+    const rutaCodificada = parsedUrl.pathname.slice(index + prefijo.length);
+    return decodeURIComponent(rutaCodificada);
+  } catch {
+    return null;
+  }
+}
+
+export function renderProductoAdminCard(producto, opciones = {}) {
+  const categorias = opciones.categorias ?? [];
+  const marcas = opciones.marcas ?? [];
+
   const variantesHtml = producto.variants.map(v => `
     <div class="admin-variant-row" data-variant-id="${v.id}">
-      <span class="admin-variant-row__label">${v.size_label}</span>
+      <input type="text" class="admin-variant-row__size" value="${v.size_label}" data-field="size_label">
+      <select class="admin-variant-row__type" data-field="type">
+        <option value="decant" ${v.type === 'decant' ? 'selected' : ''}>Decant</option>
+        <option value="completo" ${v.type === 'completo' ? 'selected' : ''}>Completo</option>
+      </select>
       <input type="number" step="0.01" min="0" class="admin-variant-row__price" value="${v.price}" data-field="price">
       <label class="admin-variant-row__available">
         <input type="checkbox" data-field="available" ${v.available ? 'checked' : ''}>
@@ -49,9 +82,36 @@ export function renderProductoAdminCard(producto) {
           </label>
         </div>
         <div class="admin-product-card__info">
-          <div class="admin-product-card__brand">${producto.brand?.name ?? ''}</div>
-          <div class="admin-product-card__name">${producto.name}</div>
-          <div class="admin-product-card__category">${producto.category?.name ?? ''}</div>
+          <div class="admin-product-card__info-grid">
+            <label class="admin-product-card__field">
+              <span>Nombre</span>
+              <input type="text" class="admin-product-card__input" data-field="name" value="${producto.name ?? ''}" required>
+            </label>
+            <label class="admin-product-card__field">
+              <span>Género</span>
+              <select class="admin-product-card__select" data-field="gender">
+                <option value="hombre" ${producto.gender === 'hombre' ? 'selected' : ''}>Hombre</option>
+                <option value="mujer" ${producto.gender === 'mujer' ? 'selected' : ''}>Mujer</option>
+                <option value="unisex" ${producto.gender === 'unisex' ? 'selected' : ''}>Unisex</option>
+              </select>
+            </label>
+            <label class="admin-product-card__field">
+              <span>Categoría</span>
+              <select class="admin-product-card__select" data-field="category_id">
+                ${renderOpciones(categorias, producto.category_id)}
+              </select>
+            </label>
+            <label class="admin-product-card__field">
+              <span>Marca</span>
+              <select class="admin-product-card__select" data-field="brand_id">
+                ${renderOpciones(marcas, producto.brand_id)}
+              </select>
+            </label>
+          </div>
+          <label class="admin-product-card__field admin-product-card__field--full">
+            <span>Descripción</span>
+            <textarea class="admin-product-card__textarea" data-field="description" rows="2" placeholder="Descripción del producto">${producto.description ?? ''}</textarea>
+          </label>
         </div>
         <label class="admin-product-card__active">
           <input type="checkbox" class="admin-product-card__active-checkbox" ${producto.is_active ? 'checked' : ''}>
@@ -97,9 +157,26 @@ export function activarProductoAdminCard(card) {
     statusEl.hidden = true;
 
     try {
+      const name = card.querySelector('[data-field="name"]').value.trim();
+      const descriptionRaw = card.querySelector('[data-field="description"]').value.trim();
+      const gender = card.querySelector('[data-field="gender"]').value;
+      const category_id = card.querySelector('[data-field="category_id"]').value || null;
+      const brand_id = card.querySelector('[data-field="brand_id"]').value || null;
+
+      if (!name) {
+        throw new Error('El nombre del producto es obligatorio.');
+      }
+
       const { error: errorProducto } = await supabaseClient
         .from('products')
-        .update({ is_active: checkboxActivo.checked })
+        .update({
+          name,
+          description: descriptionRaw || null,
+          gender,
+          category_id,
+          brand_id,
+          is_active: checkboxActivo.checked,
+        })
         .eq('id', productId);
 
       if (errorProducto) throw errorProducto;
@@ -108,12 +185,18 @@ export function activarProductoAdminCard(card) {
       const filasExistentes = card.querySelectorAll('.admin-variant-row:not(.admin-variant-row--nueva)');
       for (const fila of filasExistentes) {
         const variantId = fila.dataset.variantId;
+        const size_label = fila.querySelector('[data-field="size_label"]').value.trim();
+        const type = fila.querySelector('[data-field="type"]').value;
         const price = Number(fila.querySelector('[data-field="price"]').value);
         const available = fila.querySelector('[data-field="available"]').checked;
 
+        if (!size_label || !(price > 0)) {
+          throw new Error('Cada variante debe tener tamaño y precio válidos.');
+        }
+
         const { error: errorVariante } = await supabaseClient
           .from('variants')
-          .update({ price, available })
+          .update({ size_label, type, price, available })
           .eq('id', variantId);
 
         if (errorVariante) throw errorVariante;
@@ -126,11 +209,12 @@ export function activarProductoAdminCard(card) {
       const nuevasAInsertar = [];
       filasNuevas.forEach(fila => {
         const size_label = fila.querySelector('[data-field="size_label"]').value.trim();
+        const type = fila.querySelector('[data-field="type"]').value;
         const price = Number(fila.querySelector('[data-field="price"]').value);
         const available = fila.querySelector('[data-field="available"]').checked;
 
         if (size_label && price > 0) {
-          nuevasAInsertar.push({ product_id: productId, size_label, price, available });
+          nuevasAInsertar.push({ product_id: productId, size_label, type, price, available });
         }
       });
 
@@ -182,6 +266,8 @@ export function activarSubidaDeImagen(card) {
 
     uploadLabel.firstChild.textContent = 'Subiendo...';
     fileInput.disabled = true;
+    const imagenAnteriorUrl = thumb.src;
+    let nombreArchivoNuevo = null;
 
     try {
       // Conservamos la extensión real del archivo — Supabase
@@ -189,6 +275,7 @@ export function activarSubidaDeImagen(card) {
       // binary/octet-stream, lo que rompe la vista previa.
       const extension = file.name.split('.').pop();
       const nombreArchivo = `${productId}-${Date.now()}.${extension}`;
+      nombreArchivoNuevo = nombreArchivo;
 
       const { error: errorSubida } = await supabaseClient.storage
         .from('product-images')
@@ -207,10 +294,27 @@ export function activarSubidaDeImagen(card) {
 
       if (errorProducto) throw errorProducto;
 
+      const rutaAnterior = extraerRutaPublicaProductImages(imagenAnteriorUrl);
+      if (rutaAnterior && rutaAnterior !== nombreArchivo) {
+        const { error: errorBorradoAnterior } = await supabaseClient.storage
+          .from('product-images')
+          .remove([rutaAnterior]);
+
+        if (errorBorradoAnterior) {
+          console.warn('No se pudo borrar la imagen anterior:', errorBorradoAnterior);
+        }
+      }
+
       thumb.src = urlData.publicUrl;
       uploadLabel.firstChild.textContent = '✓ Actualizada';
       setTimeout(() => { uploadLabel.firstChild.textContent = textoOriginal; }, 1500);
     } catch (error) {
+      if (nombreArchivoNuevo) {
+        await supabaseClient.storage
+          .from('product-images')
+          .remove([nombreArchivoNuevo]);
+      }
+
       console.error('Error subiendo la imagen:', error);
       uploadLabel.firstChild.textContent = 'Error al subir';
       setTimeout(() => { uploadLabel.firstChild.textContent = textoOriginal; }, 2000);

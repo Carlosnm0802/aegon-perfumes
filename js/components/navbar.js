@@ -14,6 +14,7 @@ export function renderNavbar() {
   return `
     <a href="index.html" class="navbar__logo">AEGON<span>PERFUMES</span></a>
     <div class="navbar__actions">
+      <a href="admin/login.html" class="navbar__admin-link" aria-label="Ir al panel de administración">Admin</a>
       <button class="navbar__icon-btn" id="navbar-search-button" aria-label="Buscar">⌕</button>
       <button class="navbar__icon-btn" id="navbar-cart-button" aria-label="Ver carrito">
         <svg class="navbar__icon-svg" viewBox="0 0 24 24" width="22" height="22">
