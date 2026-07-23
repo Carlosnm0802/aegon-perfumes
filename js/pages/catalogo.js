@@ -26,6 +26,9 @@ async function cargarOpcionesDeFiltro() {
 function aplicarFiltroDesdeURL() {
   const params = new URLSearchParams(window.location.search);
   const categoria = params.get('categoria');
+  const tipo = params.get('tipo');
+  const precio = params.get('precio');
+  const marcas = params.getAll('marca');
   const busqueda = params.get('buscar');
 
   if (categoria) {
@@ -42,6 +45,38 @@ function aplicarFiltroDesdeURL() {
 
   if (busqueda) {
     filtros.busqueda = busqueda;
+  }
+
+  if (tipo) filtros.tipo = tipo;
+  if (precio) filtros.precio = precio;
+  if (marcas.length > 0) filtros.marcas = marcas;
+
+  if (tipo) {
+    const pillTipo = document.querySelector(
+      `.filter-pills[data-filter-group="tipo"] .filter-pill[data-value="${tipo}"]`
+    );
+    if (pillTipo) {
+      document.querySelectorAll('.filter-pills[data-filter-group="tipo"] .filter-pill')
+        .forEach(p => p.setAttribute('aria-pressed', 'false'));
+      pillTipo.setAttribute('aria-pressed', 'true');
+    }
+  }
+
+  if (precio) {
+    const pillPrecio = document.querySelector(
+      `.filter-pills[data-filter-group="precio"] .filter-pill[data-value="${precio}"]`
+    );
+    if (pillPrecio) {
+      document.querySelectorAll('.filter-pills[data-filter-group="precio"] .filter-pill')
+        .forEach(p => p.setAttribute('aria-pressed', 'false'));
+      pillPrecio.setAttribute('aria-pressed', 'true');
+    }
+  }
+
+  if (marcas.length > 0) {
+    document.querySelectorAll('input[name="marca"]').forEach((cb) => {
+      cb.checked = marcas.includes(cb.value);
+    });
   }
 
   mostrarIndicadorBusqueda();
@@ -68,9 +103,24 @@ function mostrarIndicadorBusqueda() {
   document.getElementById('catalog-search-clear').addEventListener('click', (e) => {
     e.preventDefault();
     filtros.busqueda = '';
+    sincronizarFiltrosEnURL();
     mostrarIndicadorBusqueda();
     cargarProductos({ reset: true });
   });
+}
+
+function sincronizarFiltrosEnURL() {
+  const params = new URLSearchParams();
+
+  if (filtros.categoria) params.set('categoria', filtros.categoria);
+  if (filtros.tipo) params.set('tipo', filtros.tipo);
+  if (filtros.precio) params.set('precio', filtros.precio);
+  if (filtros.busqueda) params.set('buscar', filtros.busqueda);
+  filtros.marcas.forEach((slug) => params.append('marca', slug));
+
+  const query = params.toString();
+  const nuevaURL = query ? `${window.location.pathname}?${query}` : window.location.pathname;
+  window.history.replaceState({}, '', nuevaURL);
 }
 
 // Traduce el rango elegido ("500-1000", "2000-") a valores
@@ -258,12 +308,17 @@ async function iniciarCatalogo() {
 
   document.getElementById('filter-aplicar').addEventListener('click', () => {
     leerFiltrosDelPanel();
+    sincronizarFiltrosEnURL();
     cargarProductos({ reset: true });
     document.getElementById('filter-overlay').classList.remove('is-visible');
     document.getElementById('filter-panel').classList.remove('is-visible');
   });
 
-  document.getElementById('filter-limpiar').addEventListener('click', limpiarPanel);
+  document.getElementById('filter-limpiar').addEventListener('click', () => {
+    limpiarPanel();
+    leerFiltrosDelPanel();
+    sincronizarFiltrosEnURL();
+  });
 
   document.getElementById('btn-cargar-mas').addEventListener('click', () => {
     cargarProductos({ reset: false });

@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
       JSON.stringify({
         payment_status: session.payment_status,
         amount_total: session.amount_total,
+        order_id: session.metadata?.orderId ?? null,
       }),
       { headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
     );

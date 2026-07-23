@@ -17,6 +17,11 @@ function renderBotonWhatsApp(numeroWhatsapp, mensaje) {
   return `<a href="https://wa.me/${numeroWhatsapp}?text=${texto}" target="_blank" rel="noopener" class="btn btn-primary">Escríbenos por WhatsApp</a>`;
 }
 
+function renderNumeroPedido(orderId) {
+  if (!orderId) return '';
+  return `<p><strong>Número de pedido:</strong> ${orderId}</p>`;
+}
+
 async function iniciarConfirmacion() {
   await renderLayout();
   const numeroWhatsapp = await obtenerWhatsappNumber();
@@ -29,6 +34,7 @@ async function iniciarConfirmacion() {
     contenedor.innerHTML = `
       <h2>No encontramos tu pedido</h2>
       <p>Si acabas de comprar y ves esto, escríbenos por WhatsApp con tu nombre y te ayudamos a confirmarlo.</p>
+      <p>Si tu pedido quedó pendiente, puedes <a href="retomar-pago.html">retomar el pago aquí</a>.</p>
       ${renderBotonWhatsApp(numeroWhatsapp, 'Hola, no me llegó la confirmación de mi pedido')}
     `;
     return;
@@ -52,12 +58,14 @@ async function iniciarConfirmacion() {
     contenedor.innerHTML = `
       <h2>¡Pago confirmado!</h2>
       <p>Gracias por tu compra. En breve empezamos a preparar tu pedido.</p>
+      ${renderNumeroPedido(data.order_id)}
       ${renderBotonWhatsApp(numeroWhatsapp, 'Hola, ya realicé mi pago, quiero confirmar mi pedido')}
     `;
   } else {
     contenedor.innerHTML = `
       <h2>Tu pedido está registrado</h2>
       <p>Si elegiste pagar en OXXO, tienes unos días para completar el pago con el voucher que se te mostró. En cuanto se confirme, empezamos a preparar tu pedido.</p>
+      ${renderNumeroPedido(data.order_id)}
       ${renderBotonWhatsApp(numeroWhatsapp, 'Hola, tengo una duda sobre mi pedido y el pago en OXXO')}
     `;
   }

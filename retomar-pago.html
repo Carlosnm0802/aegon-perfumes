@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retomar pago — AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+
+<header class="navbar" id="navbar-container"></header>
+<div id="search-bar-container"></div>
+
+<div class="container">
+  <section class="section checkout-header">
+    <h1 class="section__title">Retomar pago</h1>
+  </section>
+
+  <div class="checkout-layout" style="grid-template-columns: 1fr; max-width: 760px; margin: 0 auto;">
+    <section class="checkout-form-section">
+      <h2 class="checkout-summary__title">Ingresa tus datos del pedido</h2>
+      <p style="margin:0 0 1rem; color: var(--text-muted);">Te enviaremos de nuevo al checkout seguro para completar tu pago.</p>
+
+      <form id="retomar-pago-form">
+        <div class="form-field">
+          <label for="input-order-id">Número de pedido</label>
+          <input type="text" id="input-order-id" name="order_id" placeholder="Ej: a3d9f0b2-..." required>
+        </div>
+
+        <div class="form-field">
+          <label for="input-telefono">Teléfono del pedido</label>
+          <input type="tel" id="input-telefono" name="customer_phone" placeholder="El mismo teléfono que usaste al comprar" required>
+        </div>
+
+        <div id="retomar-pago-error" class="checkout-error" hidden></div>
+
+        <button type="submit" class="btn btn-primary" id="btn-retomar-pago" style="width:100%;">
+          Retomar pago
+        </button>
+      </form>
+    </section>
+  </div>
+</div>
+
+<footer class="footer" id="footer-container"></footer>
+<div id="whatsapp-float-container"></div>
+<div id="cart-panel-container"></div>
+
+<script type="module" src="js/pages/retomar-pago.js"></script>
+</body>
+</html>

@@ -35,6 +35,9 @@
 
     <section class="checkout-form-section">
       <h2 class="checkout-summary__title">Tus datos</h2>
+      <p style="margin:0 0 1rem; color: var(--text-muted);">
+        ¿Ya tenías un pedido pendiente? <a href="retomar-pago.html">Retoma tu pago aquí</a>.
+      </p>
       <form id="checkout-form">
 
         <div class="form-field">
@@ -64,7 +67,7 @@
         <!-- Solo se muestra si el tipo de entrega no es "recoger en persona" -->
         <div class="form-field" id="campo-direccion" hidden>
           <label for="input-direccion">Dirección de entrega</label>
-          <input type="text" id="input-direccion" name="delivery_address">
+          <input type="text" id="input-direccion" name="delivery_address" placeholder="Calle, número, colonia, código postal, ciudad, estado, referencias">
         </div>
 
         <div id="checkout-error" class="checkout-error" hidden></div>
