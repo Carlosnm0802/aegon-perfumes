@@ -7,14 +7,14 @@ que también formará parte de mi portafolio profesional como desarrollador web.
 
 El negocio se llama AegonPerfumes. Es un negocio pequeño con pocos meses de operación,
 con un catálogo aproximado de 100 perfumes (originales y decants). Ya tiene logo e identidad
-visual definida. Acepta pagos vía MercadoPago (México) y por WhatsApp.
+visual definida. Acepta pagos vía Stripe (tarjeta y OXXO) y por WhatsApp.
 
 Mi perfil técnico: Soy estudiante de Ingeniería en Sistemas en últimos semestres y trabajo
 profesionalmente como desarrollador web. Domino HTML, CSS y JavaScript vanilla. Quiero que
 este proyecto sea un escalón real hacia roles frontend o fullstack más avanzados.
 
 Stack decidido para este proyecto: Vanilla JS (HTML + CSS + JavaScript) en el frontend,
-Supabase como base de datos y backend (PostgreSQL + Auth + Storage), MercadoPago para
+Supabase como base de datos y backend (PostgreSQL + Auth + Storage), Stripe para
 pagos en línea, deploy en GitHub Pages o Netlify según lo que resulte más adecuado.
 
 El proyecto debe desarrollarse de forma estructurada, fase por fase. No avances a la
@@ -39,7 +39,7 @@ Guíame a través del proceso completo de desarrollo del proyecto, cubriendo est
 - Definir la estructura de páginas y navegación (sitemap)
 - Diseñar el modelo de datos en Supabase: tablas para productos, categorías, decants,
   variantes de tamaño/precio, carrito, pedidos, clientes
-- Definir el flujo de integración con MercadoPago (Checkout Pro vs Checkout API)
+- Definir el flujo de integración con Stripe Checkout + webhook de confirmación de pago
 - Definir flujo de notificación por WhatsApp (manual vía link generado o automatizado)
 - Definir cómo se gestiona el inventario (stock en Supabase, alertas de agotado)
 - Entregar: Sitemap + esquema de base de datos + decisiones de arquitectura justificadas
@@ -70,7 +70,7 @@ Bloque 3: Home (hero, productos destacados, secciones de categorías)
 Bloque 4: Catálogo con filtros (por categoría, marca, tipo decant/original, precio)
 Bloque 5: Ficha de producto (galería, selector de variante, descripción, botón agregar)
 Bloque 6: Carrito (lateral o página, persistencia, cálculo de total)
-Bloque 7: Checkout + integración MercadoPago (formulario → pago → redirección)
+Bloque 7: Checkout + integración Stripe (formulario → pago → redirección)
 Bloque 8: Confirmación de pedido + notificación WhatsApp generada automáticamente
 Bloque 9: Panel básico de administración (protegido con Supabase Auth) para gestionar
           productos sin tocar código
@@ -79,13 +79,13 @@ Bloque 9: Panel básico de administración (protegido con Supabase Auth) para ge
 **FASE 6 — Testing y refinamiento**
 - Checklist de QA: flujo completo de compra, responsive (móvil prioritario), rendimiento,
   accesibilidad básica, consistencia visual
-- Pruebas con MercadoPago en modo sandbox
+- Pruebas con Stripe en modo test
 - Revisión de casos límite: producto sin stock, pago fallido, carrito vacío
 - Entregar: Checklist completado + bugs resueltos documentados
 
 **FASE 7 — Deployment y entrega al cliente**
 - Deploy en Netlify (recomendado para Vanilla JS con variables de entorno seguras)
-- Configurar variables de entorno para las keys de Supabase y MercadoPago
+- Configurar variables de entorno para las keys de Supabase y Stripe
 - Preparar documentación básica para el cliente: cómo usar el panel de admin,
   cómo cargar productos, qué hacer si hay un problema
 - Crear el README del proyecto para el portafolio: problema → solución → decisiones →
@@ -118,7 +118,7 @@ El proyecto estará bien hecho cuando:
 - El catálogo sea gestionable por el dueño del negocio sin necesidad de un desarrollador
 - El código esté organizado, comentado y sea fácil de mantener
 - El diseño sea consistente, responsive y visualmente acorde al nicho de perfumería
-- La integración con MercadoPago funcione correctamente en sandbox y producción
+- La integración con Stripe funcione correctamente en test y producción
 - El portafolio entry cuente una historia real: problema → decisiones → resultado
 - Yo haya entendido cada decisión tomada, no solo copiado código
 

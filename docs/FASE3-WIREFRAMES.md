@@ -13,7 +13,7 @@ directamente en Fase 5, sin ambigüedad.
 ## 1. Flujo de usuario principal
 
 ```
-Home → Catálogo → (selección inline en tarjeta) → Carrito → Checkout → MercadoPago → Confirmación
+Home → Catálogo → (selección inline en tarjeta) → Carrito → Checkout → Stripe Checkout → Confirmación
 ```
 
 No existe una página de "ficha de producto" separada — decisión tomada en Fase 2:
@@ -173,13 +173,17 @@ la opción correcta — se confirma en Fase 5, Bloque 6.
 │ Producto B · 10ml x2   $760      │
 │ Total                 $1,210      │
 ├─────────────────────────────┤
-│ [Pagar con MercadoPago]  ← .btn-primary│
+│ [Pagar con tarjeta]      ← .btn-primary│
 └─────────────────────────────┘
 ```
 
 El campo de dirección se muestra/oculta según `orders.delivery_type` (definido en
 el modelo de datos de Fase 2) — comportamiento condicional simple con JS, sin
 recargar la página.
+
+El bloque de pago contempla dos rutas en el MVP real: tarjeta (pago inmediato) y
+OXXO (voucher, confirmación diferida). En ambos casos el usuario sale a Stripe
+Checkout y regresa con `session_id` a la confirmación.
 
 ---
 

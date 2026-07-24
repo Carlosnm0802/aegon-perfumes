@@ -64,6 +64,22 @@
           </select>
         </div>
 
+        <div class="form-field">
+          <label for="input-metodo-pago">Método de pago</label>
+          <select id="input-metodo-pago" name="payment_method" required>
+            <option value="tarjeta">Tarjeta (Stripe)</option>
+            <option value="transferencia">Transferencia</option>
+          </select>
+        </div>
+
+        <div id="transferencia-info" class="checkout-transferencia" hidden>
+          <p class="admin-form__ayuda" style="margin:0 0 .75rem;">Realiza tu transferencia con estos datos. Al confirmar, te mostraremos tu número de pedido para que envíes comprobante por WhatsApp.</p>
+          <p><strong>Banco:</strong> <span id="transfer-bank">Por definir</span></p>
+          <p><strong>Titular:</strong> <span id="transfer-holder">Por definir</span></p>
+          <p><strong>Cuenta/CLABE:</strong> <span id="transfer-account">Por definir</span></p>
+          <p><strong>Nota:</strong> <span id="transfer-note">Usa tu número de pedido como concepto y envía comprobante por WhatsApp.</span></p>
+        </div>
+
         <!-- Solo se muestra si el tipo de entrega no es "recoger en persona" -->
         <div class="form-field" id="campo-direccion" hidden>
           <label for="input-direccion">Dirección de entrega</label>
@@ -81,7 +97,7 @@
   </div>
 
   <!-- Mensaje temporal tras confirmar — el Bloque 7B lo reemplaza
-       por la redirección real a MercadoPago -->
+       por la redirección real a Stripe Checkout -->
   <div id="checkout-success" class="checkout-success" hidden>
     <h2>¡Pedido recibido!</h2>
     <p id="checkout-success-message">Tu pedido quedó registrado correctamente.</p>

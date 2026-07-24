@@ -24,8 +24,8 @@ async function iniciarRetomarPago() {
     const orderId = document.getElementById('input-order-id').value.trim();
     const phone = document.getElementById('input-telefono').value.trim();
 
-    if (!orderId || !phone) {
-      mostrarError('Ingresa el número de pedido y tu teléfono.');
+    if (!phone) {
+      mostrarError('Ingresa tu teléfono para buscar tu pedido pendiente.');
       return;
     }
 
@@ -34,7 +34,7 @@ async function iniciarRetomarPago() {
 
     try {
       const { data, error } = await supabaseClient.functions.invoke('reintentar-pago', {
-        body: { orderId, phone },
+        body: { orderId: orderId || null, phone },
       });
 
       if (error || !data?.checkout_url) {

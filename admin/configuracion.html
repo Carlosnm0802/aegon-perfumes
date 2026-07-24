@@ -22,6 +22,29 @@
       <p class="admin-form__ayuda">Con código de país, sin espacios ni símbolos — ej. 521234567890 (52 = México, luego el número a 10 dígitos).</p>
     </div>
 
+    <h2 class="checkout-summary__title" style="margin-top:1.5rem;">Datos de transferencia</h2>
+
+    <div class="form-field">
+      <label for="input-transfer-bank">Banco</label>
+      <input type="text" id="input-transfer-bank" placeholder="Ej: BBVA">
+    </div>
+
+    <div class="form-field">
+      <label for="input-transfer-holder">Titular</label>
+      <input type="text" id="input-transfer-holder" placeholder="Nombre del titular de la cuenta">
+    </div>
+
+    <div class="form-field">
+      <label for="input-transfer-account">Cuenta / Tarjeta / CLABE</label>
+      <input type="text" id="input-transfer-account" placeholder="Ej: 012345678901234567">
+      <p class="admin-form__ayuda">Puedes guardar aquí la cuenta, tarjeta o CLABE que compartes con el cliente.</p>
+    </div>
+
+    <div class="form-field">
+      <label for="input-transfer-note">Instrucciones para el cliente</label>
+      <textarea id="input-transfer-note" rows="3" placeholder="Ej: Usa tu número de pedido como concepto y envía comprobante por WhatsApp."></textarea>
+    </div>
+
     <span id="configuracion-status" class="admin-form__status" hidden></span>
     <button type="submit" class="btn btn-primary">Guardar</button>
   </form>

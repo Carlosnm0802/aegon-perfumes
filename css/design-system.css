@@ -372,7 +372,8 @@ a:hover { color: var(--color-accent-hover); }
 }
 
 .form-field input,
-.form-field select {
+.form-field select,
+.form-field textarea {
   width: 100%;
   padding: var(--space-3);
   background-color: var(--color-surface-raised);
@@ -384,8 +385,25 @@ a:hover { color: var(--color-accent-hover); }
 }
 
 .form-field input:focus,
-.form-field select:focus {
+.form-field select:focus,
+.form-field textarea:focus {
   border-color: var(--color-accent);
+}
+
+.checkout-transferencia {
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-surface-raised);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+}
+
+.checkout-transferencia p {
+  margin: 0 0 var(--space-2);
+}
+
+.checkout-transferencia p:last-child {
+  margin-bottom: 0;
 }
 
 /* ============================================================

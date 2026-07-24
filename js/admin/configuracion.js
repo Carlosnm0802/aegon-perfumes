@@ -9,7 +9,7 @@ let settingsId = null;
 async function cargarConfiguracion() {
   const { data, error } = await supabaseClient
     .from('settings')
-    .select('id, whatsapp_number')
+    .select('id, whatsapp_number, transfer_bank_name, transfer_account_holder, transfer_account_number, transfer_note')
     .limit(1)
     .single();
 
@@ -20,6 +20,10 @@ async function cargarConfiguracion() {
 
   settingsId = data.id;
   document.getElementById('input-whatsapp').value = data.whatsapp_number;
+  document.getElementById('input-transfer-bank').value = data.transfer_bank_name ?? '';
+  document.getElementById('input-transfer-holder').value = data.transfer_account_holder ?? '';
+  document.getElementById('input-transfer-account').value = data.transfer_account_number ?? '';
+  document.getElementById('input-transfer-note').value = data.transfer_note ?? '';
 }
 
 function activarFormulario() {
@@ -31,10 +35,20 @@ function activarFormulario() {
     statusEl.hidden = true;
 
     const numero = document.getElementById('input-whatsapp').value.trim();
+    const transferBank = document.getElementById('input-transfer-bank').value.trim();
+    const transferHolder = document.getElementById('input-transfer-holder').value.trim();
+    const transferAccount = document.getElementById('input-transfer-account').value.trim();
+    const transferNote = document.getElementById('input-transfer-note').value.trim();
 
     const { error } = await supabaseClient
       .from('settings')
-      .update({ whatsapp_number: numero })
+      .update({
+        whatsapp_number: numero,
+        transfer_bank_name: transferBank,
+        transfer_account_holder: transferHolder,
+        transfer_account_number: transferAccount,
+        transfer_note: transferNote,
+      })
       .eq('id', settingsId);
 
     if (error) {

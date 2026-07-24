@@ -11,8 +11,8 @@
 Home
 └── Catálogo (filtros · variantes · agregar al carrito)
     └── Carrito (resumen · cantidades · total)
-        └── Checkout (datos · entrega · pago MercadoPago)
-            └── MercadoPago (externo)
+        └── Checkout (datos · entrega · pago Stripe)
+            └── Stripe Checkout (externo)
                 └── Confirmación de pedido (resumen · link WhatsApp)
 
 Home ──(acceso admin)──> Panel Admin (protegido con Supabase Auth)
@@ -26,7 +26,7 @@ Home ──(acceso admin)──> Panel Admin (protegido con Supabase Auth)
 | Catálogo | `/catalogo` | Listado completo con filtros. Tarjeta incluye selector de variante y botón de carrito |
 | Carrito | `/carrito` | Resumen de productos seleccionados, cantidades y total |
 | Checkout | `/checkout` | Datos del cliente, tipo de entrega (local / paquetería), botón de pago |
-| MercadoPago | externo | Flujo de pago gestionado por MercadoPago. Redirige de vuelta al confirmar |
+| Stripe Checkout | externo | Flujo de pago gestionado por Stripe. Redirige de vuelta al confirmar |
 | Confirmación | `/confirmacion` | Resumen del pedido confirmado + link `wa.me` generado automáticamente |
 | Panel Admin | `/admin` | Gestión de productos, variantes, stock y pedidos. Protegido con Supabase Auth |
 
@@ -129,31 +129,34 @@ categories          brands
 
 ## 3. Decisiones de arquitectura
 
-### Flujo de integración MercadoPago (Checkout Pro)
+### Flujo de integración Stripe Checkout + webhook
 
 ```
 Frontend (carrito listo)
     │
     ▼
 Supabase Edge Function
-    │  Crea preferencia de pago con access token (seguro, server-side)
+    │  Crea sesión de pago con Secret Key (seguro, server-side)
     ▼
-API MercadoPago
+API Stripe Checkout
     │  Devuelve URL de pago
     ▼
 Frontend redirige al usuario
     │
     ▼
-MercadoPago (flujo externo — pago procesado)
+Stripe Checkout (flujo externo — pago procesado)
     │
     ▼
-Redirección a /confirmacion?payment_id=xxx
+Redirección a /confirmacion?session_id=xxx
     │
     ▼
-Frontend lee payment_id → guarda pedido en Supabase → muestra confirmación
+Frontend lee session_id → consulta verificar-pago → muestra confirmación
+    │
+    ▼
+stripe-webhook confirma pago y actualiza orders.status a "preparando"
 ```
 
-> ⚠️ **Alerta:** El access token de MercadoPago **nunca** se expone en el frontend. La Edge Function de Supabase actúa como intermediario seguro. Sin ella, las keys quedarían visibles en el código del navegador.
+> ⚠️ **Alerta:** La Secret Key de Stripe **nunca** se expone en el frontend. La Edge Function de Supabase actúa como intermediario seguro. Sin ella, las keys quedarían visibles en el código del navegador.
 
 ### Flujo de notificación WhatsApp
 
@@ -187,7 +190,7 @@ Un visitante puede leer el catálogo e insertar pedidos. No puede leer pedidos a
 ### Qué decidimos
 - Sitemap de 7 páginas con flujo de compra lineal
 - Modelo de 6 tablas; `order_items` guarda `unit_price` para preservar precios históricos
-- MercadoPago requiere Supabase Edge Function — es un requisito de seguridad, no opcional
+- Stripe requiere Supabase Edge Function + webhook — es un requisito de seguridad y consistencia operativa, no opcional
 - RLS definida por tabla antes de escribir frontend
 - `delivery_type` en órdenes contempla local y paquetería desde el día uno
 

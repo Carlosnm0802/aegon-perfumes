@@ -1,6 +1,12 @@
 import { supabaseClient } from './supabase-client.js';
 
 const NUMERO_POR_DEFECTO = '521234567890';
+const TRANSFERENCIA_POR_DEFECTO = {
+  bankName: '',
+  accountHolder: '',
+  accountNumber: '',
+  note: 'Usa tu numero de pedido como concepto y envia tu comprobante por WhatsApp.',
+};
 
 // ============================================================
 // CONFIGURACIÓN GLOBAL (settings)
@@ -24,4 +30,24 @@ export async function obtenerWhatsappNumber() {
   }
 
   return data.whatsapp_number;
+}
+
+export async function obtenerDatosTransferencia() {
+  const { data, error } = await supabaseClient
+    .from('settings')
+    .select('transfer_bank_name, transfer_account_holder, transfer_account_number, transfer_note')
+    .limit(1)
+    .single();
+
+  if (error || !data) {
+    console.error('Error obteniendo datos de transferencia, usando respaldo:', error);
+    return TRANSFERENCIA_POR_DEFECTO;
+  }
+
+  return {
+    bankName: data.transfer_bank_name ?? '',
+    accountHolder: data.transfer_account_holder ?? '',
+    accountNumber: data.transfer_account_number ?? '',
+    note: data.transfer_note || TRANSFERENCIA_POR_DEFECTO.note,
+  };
 }

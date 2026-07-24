@@ -31,8 +31,8 @@ Deno.serve(async (req) => {
   try {
     const { orderId, phone } = await req.json();
 
-    if (!orderId || !phone) {
-      return new Response(JSON.stringify({ error: "orderId y phone son obligatorios." }), {
+    if (!phone) {
+      return new Response(JSON.stringify({ error: "phone es obligatorio." }), {
         status: 400,
         headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
       });
@@ -48,14 +48,41 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const { data: order, error: orderError } = await supabaseAdmin
-      .from("orders")
-      .select("id, customer_phone, customer_email, status")
-      .eq("id", orderId)
-      .maybeSingle();
+    let order: {
+      id: string;
+      customer_phone: string;
+      customer_email: string | null;
+      status: string;
+      created_at?: string;
+    } | null = null;
 
-    if (orderError) {
-      throw orderError;
+    if (orderId) {
+      const { data: orderById, error: orderError } = await supabaseAdmin
+        .from("orders")
+        .select("id, customer_phone, customer_email, status")
+        .eq("id", orderId)
+        .maybeSingle();
+
+      if (orderError) {
+        throw orderError;
+      }
+
+      order = orderById;
+    } else {
+      // Si no mandan orderId, tomamos el pedido pendiente más
+      // reciente que coincida con el teléfono proporcionado.
+      const { data: pendingOrders, error: pendingOrdersError } = await supabaseAdmin
+        .from("orders")
+        .select("id, customer_phone, customer_email, status, created_at")
+        .eq("status", "pendiente")
+        .order("created_at", { ascending: false })
+        .limit(25);
+
+      if (pendingOrdersError) {
+        throw pendingOrdersError;
+      }
+
+      order = (pendingOrders ?? []).find((candidate) => phoneMatches(candidate.customer_phone, phone)) ?? null;
     }
 
     if (!order || order.status !== "pendiente") {
@@ -124,7 +151,7 @@ Deno.serve(async (req) => {
     });
 
     return new Response(
-      JSON.stringify({ checkout_url: session.url }),
+      JSON.stringify({ checkout_url: session.url, order_id: order.id }),
       { headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
     );
   } catch (error) {

@@ -1,6 +1,6 @@
 import { supabaseClient } from '../supabase-client.js';
 import { renderLayout } from '../components/layout.js';
-import { obtenerWhatsappNumber } from '../settings.js';
+import { obtenerWhatsappNumber, obtenerDatosTransferencia } from '../settings.js';
 
 // ============================================================
 // PÁGINA: CONFIRMACIÓN
@@ -19,7 +19,27 @@ function renderBotonWhatsApp(numeroWhatsapp, mensaje) {
 
 function renderNumeroPedido(orderId) {
   if (!orderId) return '';
-  return `<p><strong>Número de pedido:</strong> ${orderId}</p>`;
+  return `<p><strong>Numero de pedido:</strong> ${escapeHtml(orderId)}</p>`;
+}
+
+function escapeHtml(texto) {
+  return String(texto)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function renderInstruccionesTransferencia(datos) {
+  return `
+    <div class="checkout-transferencia" style="margin-top:1rem; text-align:left;">
+      <p><strong>Banco:</strong> ${escapeHtml(datos.bankName || 'Por definir')}</p>
+      <p><strong>Titular:</strong> ${escapeHtml(datos.accountHolder || 'Por definir')}</p>
+      <p><strong>Cuenta/CLABE:</strong> ${escapeHtml(datos.accountNumber || 'Por definir')}</p>
+      <p><strong>Nota:</strong> ${escapeHtml(datos.note || 'Usa tu numero de pedido como concepto y envia comprobante por WhatsApp.')}</p>
+    </div>
+  `;
 }
 
 async function iniciarConfirmacion() {
@@ -29,6 +49,21 @@ async function iniciarConfirmacion() {
   const contenedor = document.getElementById('confirmacion-contenido');
   const params = new URLSearchParams(window.location.search);
   const sessionId = params.get('session_id');
+  const metodo = params.get('metodo');
+  const orderId = params.get('order_id');
+
+  if (!sessionId && metodo === 'transferencia' && orderId) {
+    const transferencia = await obtenerDatosTransferencia();
+    const mensaje = `Hola, ya realice la transferencia de mi pedido ${orderId}. Te comparto mi comprobante.`;
+    contenedor.innerHTML = `
+      <h2>Pedido registrado para transferencia</h2>
+      <p>Tu pedido ya esta apartado. Realiza la transferencia y envianos tu comprobante para confirmar el pago.</p>
+      ${renderNumeroPedido(orderId)}
+      ${renderInstruccionesTransferencia(transferencia)}
+      ${renderBotonWhatsApp(numeroWhatsapp, mensaje)}
+    `;
+    return;
+  }
 
   if (!sessionId) {
     contenedor.innerHTML = `

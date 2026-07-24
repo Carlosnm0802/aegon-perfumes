@@ -28,7 +28,7 @@ El MVP debe contemplar ambas modalidades desde el diseño, aunque solo la local 
 
 ## Modelo de pago
 
-MercadoPago (México) para pagos en línea
+Stripe (México) para pagos en línea (tarjeta y OXXO)
 WhatsApp como canal de cierre y atención personalizada
 
 
@@ -45,7 +45,7 @@ Tener un catálogo actualizable sin depender de un desarrollador
 Catálogo navegable y filtrable por categoría, tipo (decant/original), marca y precio
 Ficha de producto con selector de variante (tamaño + precio)
 Carrito funcional que soporte múltiples productos y variantes
-Checkout integrado con MercadoPago
+Checkout integrado con Stripe
 Notificación automática al dueño por WhatsApp cuando llega un pedido
 Panel de administración para gestionar productos, stock y pedidos
 
@@ -85,7 +85,7 @@ Lo que necesita de la tienda: ficha de producto con información completa, badge
 Catálogo completo con filtros (categoría, tipo, marca, precio)
 Ficha de producto con variantes de tamaño/precio
 Carrito lateral persistente
-Checkout con MercadoPago (Checkout Pro)
+Checkout con Stripe Checkout (tarjeta y OXXO)
 Notificación al dueño por WhatsApp (link generado automáticamente)
 Panel de administración: gestión de productos, variantes, stock y pedidos
 Responsive mobile-first
@@ -105,12 +105,12 @@ Analytics o dashboard de ventas
 
 
 ## DECISIONES TÉCNICAS INICIALES
-[DECISIÓN] MercadoPago: Checkout Pro
-Usaremos Checkout Pro en lugar de Checkout API. Razón: Checkout API requiere backend propio para procesar pagos de forma segura — con Vanilla JS sin backend real, exponer las keys sería un riesgo de seguridad. Checkout Pro redirige al usuario a la página de MercadoPago (o abre un modal), maneja todo el flujo de pago en su infraestructura y luego regresa a nuestra página de confirmación. Es más seguro, más rápido de implementar y ya transmite confianza al usuario porque reconoce la interfaz de MercadoPago.
+[DECISIÓN] Stripe: Checkout + webhook
+Usaremos Stripe Checkout en lugar de una integración de cobro hecha a medida en frontend. Razón: con Vanilla JS sin backend tradicional, exponer secretos de pago sería un riesgo de seguridad. Stripe Checkout redirige al usuario al flujo seguro de Stripe, soporta tarjeta y OXXO para el mercado local, y vuelve a la página de confirmación. Además, con webhook (`stripe-webhook`) actualizamos el estado real del pedido cuando el pago se confirma, incluyendo pagos diferidos como OXXO.
 [DECISIÓN] WhatsApp: link generado, no automatizado
 La notificación al dueño será un link wa.me generado dinámicamente con el resumen del pedido pre-escrito. No usaremos la API de WhatsApp Business (requiere aprobación Meta, tiene costo). Esto es suficiente para el MVP y mantiene el toque personal que es parte del posicionamiento del negocio.
 [DECISIÓN] Deploy: Netlify
-Netlify sobre GitHub Pages porque necesitamos variables de entorno seguras para las keys de Supabase y MercadoPago. GitHub Pages es estático puro y no protege variables de entorno.
+Netlify sobre GitHub Pages porque necesitamos variables de entorno seguras para las keys de Supabase y Stripe. GitHub Pages es estático puro y no protege variables de entorno.
 
 ## MINI-RETROSPECTIVA DE FASE 1
 Qué decidimos:
@@ -124,4 +124,4 @@ WhatsApp no es un parche — es parte de la experiencia de marca y hay que integ
 Por qué importa:
 Cada una de estas decisiones va a aparecer en el modelo de datos de Fase 2. Si no las hubiéramos definido aquí, habríamos construido una estructura de base de datos que tendríamos que rehacer a mitad del proyecto.
 Qué viene después — Fase 2:
-Vamos a diseñar la arquitectura completa: el sitemap (qué páginas existen y cómo se conectan), el modelo de datos en Supabase (qué tablas, qué columnas, qué relaciones), y las decisiones de integración con MercadoPago y WhatsApp.
+Vamos a diseñar la arquitectura completa: el sitemap (qué páginas existen y cómo se conectan), el modelo de datos en Supabase (qué tablas, qué columnas, qué relaciones), y las decisiones de integración con Stripe y WhatsApp.

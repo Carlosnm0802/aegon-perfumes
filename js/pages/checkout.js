@@ -2,6 +2,7 @@ import { supabaseClient } from '../supabase-client.js';
 import { renderLayout } from '../components/layout.js';
 import { obtenerCarrito, calcularTotal, vaciarCarrito } from '../cart.js';
 import { formatearPrecio } from '../utils/format.js';
+import { obtenerDatosTransferencia } from '../settings.js';
 
 // ============================================================
 // PÁGINA: CHECKOUT
@@ -9,10 +10,10 @@ import { formatearPrecio } from '../utils/format.js';
 // Lee el carrito de localStorage, muestra el resumen, valida y
 // guarda el pedido en Supabase (orders + order_items).
 //
-// [ALERTA] Esta versión NO conecta con MercadoPago todavía — al
-// confirmar, el pedido queda guardado con status 'pendiente' y
-// se muestra un mensaje temporal. El Bloque 7B reemplaza ese
-// mensaje por la redirección real a MercadoPago Checkout Pro.
+// [ALERTA] Esta versión NO conectaba el pago en línea al inicio
+// del bloque. Hoy ya crea la sesión en Stripe Checkout; si falla,
+// el pedido queda en 'pendiente' para que el cliente pueda retomar
+// el pago después (retomar-pago.html).
 // ============================================================
 
 function renderResumenPedido(carrito) {
@@ -60,6 +61,28 @@ function mostrarError(mensaje) {
 
 function ocultarError() {
   document.getElementById('checkout-error').hidden = true;
+}
+
+function renderDatosTransferencia(datos) {
+  document.getElementById('transfer-bank').textContent = datos.bankName || 'Por definir';
+  document.getElementById('transfer-holder').textContent = datos.accountHolder || 'Por definir';
+  document.getElementById('transfer-account').textContent = datos.accountNumber || 'Por definir';
+  document.getElementById('transfer-note').textContent = datos.note || 'Usa tu numero de pedido como concepto y envia comprobante por WhatsApp.';
+}
+
+function activarMetodoPago() {
+  const selectMetodo = document.getElementById('input-metodo-pago');
+  const bloqueTransferencia = document.getElementById('transferencia-info');
+  const btnConfirmar = document.getElementById('btn-confirmar-pedido');
+
+  function actualizar() {
+    const esTransferencia = selectMetodo.value === 'transferencia';
+    bloqueTransferencia.hidden = !esTransferencia;
+    btnConfirmar.textContent = esTransferencia ? 'Confirmar pedido' : 'Pagar con tarjeta';
+  }
+
+  selectMetodo.addEventListener('change', actualizar);
+  actualizar();
 }
 
 // ============================================================
@@ -128,6 +151,8 @@ async function iniciarCheckout() {
   document.getElementById('checkout-content').hidden = false;
   renderResumenPedido(carrito);
   activarCampoDireccion();
+  renderDatosTransferencia(await obtenerDatosTransferencia());
+  activarMetodoPago();
 
   const form = document.getElementById('checkout-form');
   const btnConfirmar = document.getElementById('btn-confirmar-pedido');
@@ -142,6 +167,7 @@ async function iniciarCheckout() {
       customer_email: document.getElementById('input-email').value.trim(),
       delivery_type: document.getElementById('input-entrega').value,
       delivery_address: document.getElementById('input-direccion').value.trim(),
+      payment_method: document.getElementById('input-metodo-pago').value,
     };
 
     if (!datosCliente.customer_name || !datosCliente.customer_phone) {
@@ -159,6 +185,13 @@ async function iniciarCheckout() {
     try {
       const carritoActual = obtenerCarrito();
       const pedido = await guardarPedido(datosCliente, carritoActual);
+
+      if (datosCliente.payment_method === 'transferencia') {
+        vaciarCarrito();
+        const destino = `confirmacion.html?metodo=transferencia&order_id=${encodeURIComponent(pedido.id)}`;
+        window.location.href = destino;
+        return;
+      }
 
       btnConfirmar.textContent = 'Conectando con el pago...';
 
@@ -182,7 +215,7 @@ async function iniciarCheckout() {
 
       vaciarCarrito();
 
-      // A diferencia de MercadoPago, Stripe usa la MISMA URL para
+      // Stripe usa la MISMA URL de checkout para modo prueba y
       // modo prueba y producción — el cambio entre uno y otro se
       // hace solo con qué Secret Key configuraste en Supabase
       // (sk_test_... vs sk_live_...), sin tocar esta línea.

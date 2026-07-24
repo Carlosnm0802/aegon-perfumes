@@ -5,8 +5,8 @@ import Stripe from "npm:stripe@17";
 // EDGE FUNCTION: crear-sesion-pago (Stripe)
 // ============================================================
 // Recibe los datos de un pedido ya guardado en Supabase y crea
-// una "Checkout Session" de Stripe — el equivalente a la
-// "preferencia" de MercadoPago. Soporta tarjeta Y pago en
+// una "Checkout Session" de Stripe para el cobro externo.
+// Soporta tarjeta Y pago en
 // efectivo en OXXO. Devuelve la URL a la que el navegador debe
 // redirigir al cliente para pagar.
 //

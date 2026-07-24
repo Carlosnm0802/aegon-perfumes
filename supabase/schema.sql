@@ -405,7 +405,11 @@ create policy "brands: insertar solo admin"
 
 create table settings (
   id uuid primary key default gen_random_uuid(),
-  whatsapp_number text not null default '521234567890'
+  whatsapp_number text not null default '521234567890',
+  transfer_bank_name text not null default '',
+  transfer_account_holder text not null default '',
+  transfer_account_number text not null default '',
+  transfer_note text not null default 'Usa tu numero de pedido como concepto y envia tu comprobante por WhatsApp.'
 );
 
 alter table settings enable row level security;
@@ -420,3 +424,8 @@ create policy "settings: actualizar solo admin"
   with check (true);
 
 insert into settings (whatsapp_number) values ('521234567890');
+
+alter table settings add column if not exists transfer_bank_name text not null default '';
+alter table settings add column if not exists transfer_account_holder text not null default '';
+alter table settings add column if not exists transfer_account_number text not null default '';
+alter table settings add column if not exists transfer_note text not null default 'Usa tu numero de pedido como concepto y envia tu comprobante por WhatsApp.';
