@@ -6,7 +6,7 @@ import { renderFilterPanel, activarPanelFiltros } from '../components/filter-pan
 
 const PRODUCTOS_POR_PAGINA = 12;
 
-let filtros = { categoria: '', tipo: '', precio: '', marcas: [], busqueda: '' };
+let filtros = { categoria: '', tipo: '', precio: '', genero: '', marcas: [], busqueda: '' };
 let paginaActual = 0;
 
 // ============================================================
@@ -28,6 +28,7 @@ function aplicarFiltroDesdeURL() {
   const categoria = params.get('categoria');
   const tipo = params.get('tipo');
   const precio = params.get('precio');
+  const genero = params.get('genero');
   const marcas = params.getAll('marca');
   const busqueda = params.get('buscar');
 
@@ -49,6 +50,7 @@ function aplicarFiltroDesdeURL() {
 
   if (tipo) filtros.tipo = tipo;
   if (precio) filtros.precio = precio;
+  if (genero) filtros.genero = genero;
   if (marcas.length > 0) filtros.marcas = marcas;
 
   if (tipo) {
@@ -115,6 +117,7 @@ function sincronizarFiltrosEnURL() {
   if (filtros.categoria) params.set('categoria', filtros.categoria);
   if (filtros.tipo) params.set('tipo', filtros.tipo);
   if (filtros.precio) params.set('precio', filtros.precio);
+  if (filtros.genero) params.set('genero', filtros.genero);
   if (filtros.busqueda) params.set('buscar', filtros.busqueda);
   filtros.marcas.forEach((slug) => params.append('marca', slug));
 
@@ -160,6 +163,9 @@ function construirConsulta() {
   }
   if (filtros.marcas.length > 0) {
     query = query.in('brand.slug', filtros.marcas);
+  }
+  if (filtros.genero) {
+    query = query.eq('gender', filtros.genero);
   }
   if (filtros.tipo) {
     query = query.eq('variants.type', filtros.tipo);

@@ -18,7 +18,7 @@ async function cargarProductos() {
       supabaseClient
         .from('products')
         .select(`
-          id, name, description, image_url, gender, category_id, brand_id, is_active,
+          id, name, description, image_url, gender, category_id, brand_id, is_active, is_new_arrival, is_bestseller,
           brand:brands(name),
           category:categories(name),
           variants(id, size_label, type, price, available)

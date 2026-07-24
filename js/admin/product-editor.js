@@ -117,6 +117,14 @@ export function renderProductoAdminCard(producto, opciones = {}) {
           <input type="checkbox" class="admin-product-card__active-checkbox" ${producto.is_active ? 'checked' : ''}>
           Activo
         </label>
+        <label class="admin-product-card__active">
+          <input type="checkbox" class="admin-product-card__arrival-checkbox" ${producto.is_new_arrival ? 'checked' : ''}>
+          Recién llegado
+        </label>
+        <label class="admin-product-card__active">
+          <input type="checkbox" class="admin-product-card__bestseller-checkbox" ${producto.is_bestseller ? 'checked' : ''}>
+          Más vendido
+        </label>
       </div>
 
       <div class="admin-product-card__variants">
@@ -139,6 +147,8 @@ export function activarProductoAdminCard(card) {
   const contenedorVariantes = card.querySelector('.admin-product-card__variants');
   const statusEl = card.querySelector('.admin-product-card__status');
   const checkboxActivo = card.querySelector('.admin-product-card__active-checkbox');
+  const checkboxRecienLlegado = card.querySelector('.admin-product-card__arrival-checkbox');
+  const checkboxMasVendido = card.querySelector('.admin-product-card__bestseller-checkbox');
 
   btnAgregarVariante.addEventListener('click', () => {
     contenedorVariantes.insertAdjacentHTML('beforeend', renderNuevaVariantRow());
@@ -176,6 +186,8 @@ export function activarProductoAdminCard(card) {
           category_id,
           brand_id,
           is_active: checkboxActivo.checked,
+          is_new_arrival: checkboxRecienLlegado.checked,
+          is_bestseller: checkboxMasVendido.checked,
         })
         .eq('id', productId);
 

@@ -14,7 +14,7 @@
 <!-- ============================================================
      HERO
      ============================================================ -->
-<section class="hero">
+<section class="hero" id="inicio">
   <div class="hero__eyebrow">Perfumes y decants</div>
   <h1 class="hero__title">Fragancias originales,<br>al alcance de cada ocasión</h1>
   <p class="hero__subtitle">
@@ -62,7 +62,7 @@
   <!-- ============================================================
        CATEGORÍAS DESTACADAS
        ============================================================ -->
-  <section class="section">
+  <section class="section" id="categorias">
     <div class="section__header">
       <h2 class="section__title">Explora por estilo</h2>
     </div>
@@ -85,6 +85,22 @@
   <hr class="divider-gold">
 
   <!-- ============================================================
+       RECIÉN LLEGADOS
+       ============================================================ -->
+  <section class="section" id="recien-llegados">
+    <div class="section__header">
+      <h2 class="section__title">Recién llegados</h2>
+      <a href="catalogo.html" class="section__link">Ver novedades en catálogo →</a>
+    </div>
+
+    <div class="product-grid" id="recien-llegados-grid">
+      <!-- Tarjetas inyectadas desde js/pages/home.js -->
+    </div>
+  </section>
+
+  <hr class="divider-gold">
+
+  <!-- ============================================================
        MÁS VENDIDOS
        ============================================================ -->
   <section class="section">
@@ -93,7 +109,7 @@
       <a href="catalogo.html" class="section__link">Ver catálogo completo →</a>
     </div>
 
-    <div class="product-grid">
+    <div class="product-grid" id="mas-vendidos-grid">
       <!-- Las tarjetas se inyectan dinámicamente desde js/pages/home.js -->
     </div>
   </section>
@@ -107,20 +123,66 @@
     <h2 class="section__title" style="margin-bottom: var(--space-2);">Síguenos en Instagram</h2>
     <p class="instagram-section__handle">@aegonparfums</p>
     <div class="instagram-grid">
-      <a class="instagram-grid__item" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
-        <img src="https://images.unsplash.com/photo-1505239034653-abfc95288b6c?w=300&h=300&fit=crop&q=70&auto=format" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
+      <a class="instagram-grid__item" id="instagram-item-1" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
+        <img id="instagram-image-1" src="https://images.unsplash.com/photo-1505239034653-abfc95288b6c?w=300&h=300&fit=crop&q=70&auto=format" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
       </a>
-      <a class="instagram-grid__item" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
-        <img src="https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.3" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
+      <a class="instagram-grid__item" id="instagram-item-2" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
+        <img id="instagram-image-2" src="https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.3" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
       </a>
-      <a class="instagram-grid__item" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
-        <img src="https://images.unsplash.com/photo-1543422655-ac1c6ca993ed?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.7" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
+      <a class="instagram-grid__item" id="instagram-item-3" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
+        <img id="instagram-image-3" src="https://images.unsplash.com/photo-1543422655-ac1c6ca993ed?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.7" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
       </a>
-      <a class="instagram-grid__item" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
-        <img src="https://images.unsplash.com/photo-1749264361617-dbe17a223f54?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.4" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
+      <a class="instagram-grid__item" id="instagram-item-4" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
+        <img id="instagram-image-4" src="https://images.unsplash.com/photo-1749264361617-dbe17a223f54?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.4" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
+      </a>
+      <a class="instagram-grid__item" id="instagram-item-5" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
+        <img id="instagram-image-5" src="https://images.unsplash.com/photo-1557170334-a9086f3f5c9b?w=300&h=300&fit=crop&q=70&auto=format" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
+      </a>
+      <a class="instagram-grid__item" id="instagram-item-6" href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener">
+        <img id="instagram-image-6" src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=300&h=300&fit=crop&q=70&auto=format" alt="Publicación de Instagram AegonPerfumes" loading="lazy" width="300" height="300">
       </a>
     </div>
-    <a href="https://www.instagram.com/aegonparfums" target="_blank" rel="noopener" class="btn btn-secondary">Ver perfil completo</a>
+    <a href="https://www.instagram.com/aegonparfums" id="instagram-profile-link" target="_blank" rel="noopener" class="btn btn-secondary">Ver perfil completo</a>
+  </section>
+
+  <hr class="divider-gold">
+
+  <section class="section testimonios" id="testimonios">
+    <div class="section__header">
+      <h2 class="section__title">Testimonios y opiniones</h2>
+    </div>
+
+    <p class="testimonios__intro">Cuéntanos cómo fue tu experiencia con AegonPerfumes. Tu opinión ayuda a otros compradores.</p>
+
+    <div class="testimonios__layout">
+      <form id="testimonio-form" class="testimonio-form">
+        <div class="form-field">
+          <label for="testimonio-nombre">Tu nombre</label>
+          <input type="text" id="testimonio-nombre" maxlength="60" placeholder="Ej: Carlos" required>
+        </div>
+
+        <div class="form-field">
+          <label for="testimonio-calificacion">Calificación</label>
+          <select id="testimonio-calificacion" required>
+            <option value="5">5 estrellas</option>
+            <option value="4">4 estrellas</option>
+            <option value="3">3 estrellas</option>
+            <option value="2">2 estrellas</option>
+            <option value="1">1 estrella</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="testimonio-opinion">Tu opinión</label>
+          <textarea id="testimonio-opinion" rows="4" maxlength="280" placeholder="Describe tu experiencia de compra, envío y producto" required></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enviar testimonio</button>
+        <p id="testimonio-status" class="testimonio-form__status" hidden></p>
+      </form>
+
+      <div id="testimonios-lista" class="testimonios__lista" aria-live="polite"></div>
+    </div>
   </section>
 
 </div>

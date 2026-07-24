@@ -482,6 +482,10 @@ a:hover { color: var(--color-accent-hover); }
   gap: var(--space-4);
 }
 
+.navbar__menu-btn {
+  display: inline-flex;
+}
+
 .navbar__admin-link {
   display: inline-flex;
   align-items: center;
@@ -528,6 +532,85 @@ a:hover { color: var(--color-accent-hover); }
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.navbar-menu-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--color-overlay);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-base);
+  z-index: 32;
+}
+
+.navbar-menu-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.navbar-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(330px, 92vw);
+  padding: calc(var(--space-7) + var(--space-3)) var(--space-5) var(--space-5);
+  background: linear-gradient(180deg, rgba(26, 26, 30, 0.98) 0%, rgba(18, 18, 20, 0.98) 100%);
+  border-left: 1px solid var(--color-border);
+  transform: translateX(105%);
+  transition: transform var(--transition-base);
+  z-index: 33;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.navbar-menu.is-visible {
+  transform: translateX(0);
+}
+
+.navbar-menu__link {
+  color: var(--color-text-primary);
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  letter-spacing: 0.02em;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.navbar-menu__link:hover {
+  color: var(--color-accent-hover);
+}
+
+.navbar-menu__socials {
+  margin-top: auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+}
+
+.navbar-menu__social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
+  font-size: var(--fs-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+}
+
+.navbar-menu__social-link svg {
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+}
+
+.navbar-menu__social-link:last-child svg {
+  fill: currentColor;
+  stroke: none;
 }
 
 @media (max-width: 640px) {
@@ -822,7 +905,7 @@ a:hover { color: var(--color-accent-hover); }
 
 .instagram-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--space-2);
   margin-bottom: var(--space-5);
 }
@@ -855,9 +938,74 @@ a:hover { color: var(--color-accent-hover); }
   opacity: 0.3;
 }
 
+/* ============================================================
+   TESTIMONIOS
+   ============================================================ */
+
+.testimonios__intro {
+  margin-bottom: var(--space-5);
+}
+
+.testimonios__layout {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: var(--space-5);
+}
+
+.testimonio-form {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+.testimonio-form__status {
+  display: block;
+  margin-top: var(--space-3);
+  color: var(--color-accent);
+  font-size: var(--fs-sm);
+}
+
+.testimonios__lista {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.testimonio-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.testimonio-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.testimonio-card__nombre {
+  font-family: var(--font-display);
+  font-size: var(--fs-md);
+  color: var(--color-text-primary);
+}
+
+.testimonio-card__rating {
+  color: var(--color-accent-hover);
+  letter-spacing: 0.1em;
+  font-size: var(--fs-sm);
+}
+
+.testimonio-card__texto {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
 @media (max-width: 640px) {
-  .instagram-grid {
-    grid-template-columns: repeat(3, 1fr);
+  .testimonios__layout {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -2269,6 +2417,206 @@ a:hover { color: var(--color-accent-hover); }
   color: var(--color-text-primary);
   font-family: var(--font-body);
   font-size: var(--fs-base);
+}
+
+/* ============================================================
+   MARCAS (PÚBLICO)
+   ============================================================ */
+
+.marcas-header {
+  padding-bottom: var(--space-4);
+}
+
+.marcas-header__desc {
+  margin: 0;
+}
+
+.marcas-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: var(--space-5);
+}
+
+.marcas-panel {
+  align-self: start;
+}
+
+.marcas-search-bar {
+  margin-bottom: var(--space-3);
+}
+
+.marcas-search-bar input {
+  max-width: none;
+}
+
+.marcas-lista {
+  margin-bottom: 0;
+}
+
+.marcas-lista__btn {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  padding: var(--space-1) 0;
+  cursor: pointer;
+  font-size: var(--fs-sm);
+}
+
+.marcas-lista__btn.is-active {
+  color: var(--color-accent);
+}
+
+.marcas-result-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+  gap: var(--space-3);
+}
+
+.marcas-result-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.marcas-productos {
+  padding-bottom: var(--space-4);
+}
+
+@media (max-width: 900px) {
+  .marcas-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   TESTIMONIOS (ADMIN)
+   ============================================================ */
+
+.admin-testimonios-lista {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-bottom: var(--space-7);
+}
+
+.admin-testimonio-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+}
+
+.admin-testimonio-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.admin-testimonio-card__name {
+  color: var(--color-text-primary);
+  font-weight: var(--fw-semibold);
+}
+
+.admin-testimonio-card__meta {
+  font-size: var(--fs-xs);
+  color: var(--color-text-secondary);
+}
+
+.admin-testimonio-card__text {
+  margin: 0;
+}
+
+.admin-testimonio-card__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--fs-sm);
+}
+
+.admin-testimonios-filtros {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  align-items: center;
+}
+
+.admin-testimonios-filtros__select {
+  padding: var(--space-3);
+  background-color: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: var(--fs-sm);
+}
+
+.admin-testimonios-acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.admin-testimonios-acciones__status {
+  font-size: var(--fs-sm);
+  color: var(--color-accent);
+}
+
+.admin-testimonios-acciones__status.is-error {
+  color: #E58F8F;
+}
+
+.admin-testimonios-paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.admin-testimonios-paginacion .btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+@media (max-width: 640px) {
+  .marcas-result-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .marcas-result-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .admin-testimonios-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-testimonios-acciones {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-testimonios-paginacion {
+    justify-content: space-between;
+  }
+
+  .admin-testimonio-card__head {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
 }
 /* ============================================================
    DASHBOARD (ADMIN)

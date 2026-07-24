@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testimonios — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<div class="container admin-content">
+  <h1 class="section__title">Testimonios</h1>
+
+  <div class="admin-testimonios-filtros">
+    <div class="admin-search-bar" style="margin-bottom:0;">
+      <input type="search" id="admin-buscar-testimonio" placeholder="Buscar por nombre u opinión..." autocomplete="off">
+    </div>
+
+    <select id="admin-filtro-rating" class="admin-testimonios-filtros__select" aria-label="Filtrar por estrellas">
+      <option value="">Todas las estrellas</option>
+      <option value="5">5 estrellas</option>
+      <option value="4">4 estrellas</option>
+      <option value="3">3 estrellas</option>
+      <option value="2">2 estrellas</option>
+      <option value="1">1 estrella</option>
+    </select>
+
+    <select id="admin-filtro-visibilidad" class="admin-testimonios-filtros__select" aria-label="Filtrar por visibilidad">
+      <option value="all">Todos</option>
+      <option value="visible">Solo visibles</option>
+      <option value="hidden">Solo ocultos</option>
+    </select>
+  </div>
+
+  <div class="admin-testimonios-acciones">
+    <button type="button" class="btn btn-secondary" id="admin-testimonios-hide-1star">Ocultar reseñas de 1 estrella</button>
+    <button type="button" class="btn btn-secondary" id="admin-testimonios-show-hidden">Publicar testimonios ocultos</button>
+    <span id="admin-testimonios-bulk-status" class="admin-testimonios-acciones__status" hidden></span>
+  </div>
+
+  <div id="admin-testimonios-lista" class="admin-testimonios-lista">
+    <p>Cargando testimonios...</p>
+  </div>
+
+  <div class="admin-testimonios-paginacion">
+    <button class="btn btn-secondary" id="admin-testimonios-prev" type="button">Anterior</button>
+    <span id="admin-testimonios-page-info">Página 1 de 1</span>
+    <button class="btn btn-secondary" id="admin-testimonios-next" type="button">Siguiente</button>
+  </div>
+</div>
+
+<script type="module" src="../js/admin/testimonios.js"></script>
+</body>
+</html>

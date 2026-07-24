@@ -1,10 +1,10 @@
-import { renderNavbar, actualizarContadorCarrito } from './navbar.js';
+import { renderNavbar, actualizarContadorCarrito, activarNavbarMenu } from './navbar.js';
 import { renderFooter } from './footer.js';
 import { renderWhatsappFloat } from './whatsapp-float.js';
 import { renderCartPanel, activarCartPanel } from './cart-panel.js';
 import { renderSearchBar, activarSearchBar } from './search-bar.js';
 import { obtenerCarrito, contarItems } from '../cart.js';
-import { obtenerWhatsappNumber } from '../settings.js';
+import { obtenerWhatsappNumber, obtenerSocialLinks } from '../settings.js';
 
 // ============================================================
 // LAYOUT COMPARTIDO
@@ -19,14 +19,18 @@ import { obtenerWhatsappNumber } from '../settings.js';
 // ============================================================
 
 export async function renderLayout() {
-  const numeroWhatsapp = await obtenerWhatsappNumber();
+  const [numeroWhatsapp, socialLinks] = await Promise.all([
+    obtenerWhatsappNumber(),
+    obtenerSocialLinks(),
+  ]);
 
-  document.getElementById('navbar-container').innerHTML = renderNavbar();
+  document.getElementById('navbar-container').innerHTML = renderNavbar(socialLinks);
   document.getElementById('footer-container').innerHTML = renderFooter(numeroWhatsapp);
   document.getElementById('whatsapp-float-container').innerHTML = renderWhatsappFloat(numeroWhatsapp);
   document.getElementById('cart-panel-container').innerHTML = renderCartPanel();
   document.getElementById('search-bar-container').innerHTML = renderSearchBar();
 
+  activarNavbarMenu();
   activarCartPanel();
   activarSearchBar();
 

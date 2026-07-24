@@ -127,6 +127,8 @@ async function crearProducto(datos, variantes, archivoFoto) {
       category_id: datos.category_id,
       brand_id: datos.brand_id,
       is_active: true,
+      is_new_arrival: datos.is_new_arrival,
+      is_bestseller: datos.is_bestseller,
     });
 
   if (errorProducto) throw errorProducto;
@@ -175,6 +177,8 @@ async function iniciar() {
       gender: document.getElementById('input-genero').value,
       category_id: document.getElementById('input-categoria').value,
       brand_id: document.getElementById('input-marca').value,
+      is_new_arrival: document.getElementById('input-recien-llegado').checked,
+      is_bestseller: document.getElementById('input-mas-vendido').checked,
     };
 
     const archivoFoto = document.getElementById('input-foto').files[0] || null;

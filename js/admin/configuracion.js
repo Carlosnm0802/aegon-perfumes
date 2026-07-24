@@ -9,7 +9,7 @@ let settingsId = null;
 async function cargarConfiguracion() {
   const { data, error } = await supabaseClient
     .from('settings')
-    .select('id, whatsapp_number, transfer_bank_name, transfer_account_holder, transfer_account_number, transfer_note')
+    .select('id, whatsapp_number, instagram_url, tiktok_url, instagram_image_1, instagram_image_2, instagram_image_3, instagram_image_4, instagram_image_5, instagram_image_6, transfer_bank_name, transfer_account_holder, transfer_account_number, transfer_note')
     .limit(1)
     .single();
 
@@ -20,6 +20,14 @@ async function cargarConfiguracion() {
 
   settingsId = data.id;
   document.getElementById('input-whatsapp').value = data.whatsapp_number;
+  document.getElementById('input-instagram').value = data.instagram_url ?? '';
+  document.getElementById('input-tiktok').value = data.tiktok_url ?? '';
+  document.getElementById('input-instagram-image-1').value = data.instagram_image_1 ?? '';
+  document.getElementById('input-instagram-image-2').value = data.instagram_image_2 ?? '';
+  document.getElementById('input-instagram-image-3').value = data.instagram_image_3 ?? '';
+  document.getElementById('input-instagram-image-4').value = data.instagram_image_4 ?? '';
+  document.getElementById('input-instagram-image-5').value = data.instagram_image_5 ?? '';
+  document.getElementById('input-instagram-image-6').value = data.instagram_image_6 ?? '';
   document.getElementById('input-transfer-bank').value = data.transfer_bank_name ?? '';
   document.getElementById('input-transfer-holder').value = data.transfer_account_holder ?? '';
   document.getElementById('input-transfer-account').value = data.transfer_account_number ?? '';
@@ -35,6 +43,14 @@ function activarFormulario() {
     statusEl.hidden = true;
 
     const numero = document.getElementById('input-whatsapp').value.trim();
+    const instagramUrl = document.getElementById('input-instagram').value.trim();
+    const tiktokUrl = document.getElementById('input-tiktok').value.trim();
+    const instagramImage1 = document.getElementById('input-instagram-image-1').value.trim();
+    const instagramImage2 = document.getElementById('input-instagram-image-2').value.trim();
+    const instagramImage3 = document.getElementById('input-instagram-image-3').value.trim();
+    const instagramImage4 = document.getElementById('input-instagram-image-4').value.trim();
+    const instagramImage5 = document.getElementById('input-instagram-image-5').value.trim();
+    const instagramImage6 = document.getElementById('input-instagram-image-6').value.trim();
     const transferBank = document.getElementById('input-transfer-bank').value.trim();
     const transferHolder = document.getElementById('input-transfer-holder').value.trim();
     const transferAccount = document.getElementById('input-transfer-account').value.trim();
@@ -44,6 +60,14 @@ function activarFormulario() {
       .from('settings')
       .update({
         whatsapp_number: numero,
+        instagram_url: instagramUrl,
+        tiktok_url: tiktokUrl,
+        instagram_image_1: instagramImage1,
+        instagram_image_2: instagramImage2,
+        instagram_image_3: instagramImage3,
+        instagram_image_4: instagramImage4,
+        instagram_image_5: instagramImage5,
+        instagram_image_6: instagramImage6,
         transfer_bank_name: transferBank,
         transfer_account_holder: transferHolder,
         transfer_account_number: transferAccount,

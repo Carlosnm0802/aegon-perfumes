@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marcas — AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/design-system.css">
+</head>
+<body>
+
+<header class="navbar" id="navbar-container"></header>
+<div id="search-bar-container"></div>
+
+<div class="container">
+  <section class="section marcas-header">
+    <h1 class="section__title">Marcas</h1>
+    <p class="marcas-header__desc">Busca una marca y explora sus fragancias disponibles.</p>
+  </section>
+
+  <section class="section" style="padding-top: 0;">
+    <div class="marcas-layout">
+      <aside class="admin-panel-section marcas-panel">
+        <h2 class="admin-form__subtitle">Lista de marcas</h2>
+        <div class="admin-search-bar marcas-search-bar">
+          <input type="search" id="marcas-buscar" placeholder="Buscar marca..." autocomplete="off">
+        </div>
+        <ul id="marcas-lista" class="admin-simple-list marcas-lista">
+          <li>Cargando marcas...</li>
+        </ul>
+      </aside>
+
+      <div>
+        <div class="marcas-result-header">
+          <h2 class="admin-form__subtitle" id="marcas-seleccion-titulo">Selecciona una marca</h2>
+          <div class="marcas-result-actions">
+            <a href="catalogo.html" class="section__link" id="marcas-link-catalogo">Ver esta marca en catálogo →</a>
+            <a href="catalogo.html" class="section__link">Ver catálogo completo →</a>
+          </div>
+        </div>
+        <div id="marcas-productos" class="product-grid marcas-productos"></div>
+        <div id="marcas-empty" class="catalog-empty" hidden></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="footer" id="footer-container"></footer>
+<div id="whatsapp-float-container"></div>
+<div id="cart-panel-container"></div>
+
+<script type="module" src="js/pages/marcas.js"></script>
+</body>
+</html>

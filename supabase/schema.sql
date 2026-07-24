@@ -50,6 +50,8 @@ create table products (
   type product_type not null,
   category_id uuid references categories(id) on delete set null,
   brand_id uuid references brands(id) on delete set null,
+  is_new_arrival boolean not null default false,
+  is_bestseller boolean not null default false,
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -335,6 +337,8 @@ delete from products
 where name in ('YSL "Y" EDP (Decant)', 'Acqua di Gio Profondo (Decant)');
 
 alter table products drop column type;
+alter table products add column if not exists is_new_arrival boolean not null default false;
+alter table products add column if not exists is_bestseller boolean not null default false;
 
 
 ---Politica para darle acceso a lectura total al admin sobre sus productos
@@ -406,6 +410,14 @@ create policy "brands: insertar solo admin"
 create table settings (
   id uuid primary key default gen_random_uuid(),
   whatsapp_number text not null default '521234567890',
+  instagram_url text not null default 'https://www.instagram.com/aegonparfums',
+  tiktok_url text not null default 'https://www.tiktok.com',
+  instagram_image_1 text not null default '',
+  instagram_image_2 text not null default '',
+  instagram_image_3 text not null default '',
+  instagram_image_4 text not null default '',
+  instagram_image_5 text not null default '',
+  instagram_image_6 text not null default '',
   transfer_bank_name text not null default '',
   transfer_account_holder text not null default '',
   transfer_account_number text not null default '',
@@ -425,7 +437,46 @@ create policy "settings: actualizar solo admin"
 
 insert into settings (whatsapp_number) values ('521234567890');
 
+alter table settings add column if not exists instagram_url text not null default 'https://www.instagram.com/aegonparfums';
+alter table settings add column if not exists tiktok_url text not null default 'https://www.tiktok.com';
+alter table settings add column if not exists instagram_image_1 text not null default '';
+alter table settings add column if not exists instagram_image_2 text not null default '';
+alter table settings add column if not exists instagram_image_3 text not null default '';
+alter table settings add column if not exists instagram_image_4 text not null default '';
+alter table settings add column if not exists instagram_image_5 text not null default '';
+alter table settings add column if not exists instagram_image_6 text not null default '';
+
 alter table settings add column if not exists transfer_bank_name text not null default '';
 alter table settings add column if not exists transfer_account_holder text not null default '';
 alter table settings add column if not exists transfer_account_number text not null default '';
 alter table settings add column if not exists transfer_note text not null default 'Usa tu numero de pedido como concepto y envia tu comprobante por WhatsApp.';
+
+create table if not exists testimonials (
+  id uuid primary key default gen_random_uuid(),
+  customer_name text not null,
+  rating integer not null check (rating >= 1 and rating <= 5),
+  opinion text not null,
+  is_visible boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table testimonials enable row level security;
+
+create policy "testimonials: lectura pública de visibles"
+  on testimonials for select
+  using (is_visible = true);
+
+create policy "testimonials: insertar públicamente"
+  on testimonials for insert
+  with check (true);
+
+create policy "testimonials: lectura solo admin"
+  on testimonials for select
+  to authenticated
+  using (true);
+
+create policy "testimonials: actualizar solo admin"
+  on testimonials for update
+  to authenticated
+  using (true)
+  with check (true);
