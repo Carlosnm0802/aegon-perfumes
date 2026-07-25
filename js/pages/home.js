@@ -142,7 +142,7 @@ async function cargarMasVendidos() {
   const consultaBase = `
     id, name, image_url,
     brand:brands(name),
-    variants(id, size_label, price, available, type)
+    variants(id, size_label, price, discount_percentage, available, type)
   `;
 
   const { data: destacados, error } = await supabaseClient
@@ -189,7 +189,7 @@ async function cargarRecienLlegados() {
   const consultaBase = `
     id, name, image_url,
     brand:brands(name),
-    variants(id, size_label, price, available, type)
+    variants(id, size_label, price, discount_percentage, available, type)
   `;
 
   const { data: destacados, error } = await supabaseClient

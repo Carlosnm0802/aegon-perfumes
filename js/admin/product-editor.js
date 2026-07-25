@@ -19,6 +19,10 @@ function renderNuevaVariantRow() {
         <option value="completo">Completo</option>
       </select>
       <input type="number" step="0.01" min="0" placeholder="Precio" class="admin-variant-row__price" data-field="price">
+      <div class="admin-variant-row__discount-field">
+        <span class="admin-variant-row__discount-label">Descuento %</span>
+        <input type="number" step="0.01" min="0" max="100" value="0" placeholder="20" class="admin-variant-row__discount" data-field="discount_percentage" disabled>
+      </div>
       <label class="admin-variant-row__available">
         <input type="checkbox" data-field="available" checked>
         Disponible
@@ -32,6 +36,24 @@ function renderOpciones(items, selectedId) {
   return (items ?? []).map(item => `
     <option value="${item.id}" ${item.id === selectedId ? 'selected' : ''}>${item.name}</option>
   `).join('');
+}
+
+function aplicarEstadoDescuentoVariante(fila) {
+  const selectTipo = fila.querySelector('[data-field="type"]');
+  const inputDescuento = fila.querySelector('[data-field="discount_percentage"]');
+
+  if (!selectTipo || !inputDescuento) return;
+
+  const actualizar = () => {
+    const esCompleto = selectTipo.value === 'completo';
+    inputDescuento.disabled = !esCompleto;
+    if (!esCompleto) {
+      inputDescuento.value = '0';
+    }
+  };
+
+  selectTipo.addEventListener('change', actualizar);
+  actualizar();
 }
 
 function extraerRutaPublicaProductImages(url) {
@@ -62,6 +84,10 @@ export function renderProductoAdminCard(producto, opciones = {}) {
         <option value="completo" ${v.type === 'completo' ? 'selected' : ''}>Completo</option>
       </select>
       <input type="number" step="0.01" min="0" class="admin-variant-row__price" value="${v.price}" data-field="price">
+      <div class="admin-variant-row__discount-field">
+        <span class="admin-variant-row__discount-label">Descuento %</span>
+        <input type="number" step="0.01" min="0" max="100" class="admin-variant-row__discount" value="${Number(v.discount_percentage ?? 0)}" data-field="discount_percentage" ${v.type === 'decant' ? 'disabled' : ''}>
+      </div>
       <label class="admin-variant-row__available">
         <input type="checkbox" data-field="available" ${v.available ? 'checked' : ''}>
         Disponible
@@ -150,9 +176,12 @@ export function activarProductoAdminCard(card) {
   const checkboxRecienLlegado = card.querySelector('.admin-product-card__arrival-checkbox');
   const checkboxMasVendido = card.querySelector('.admin-product-card__bestseller-checkbox');
 
+  contenedorVariantes.querySelectorAll('.admin-variant-row').forEach(aplicarEstadoDescuentoVariante);
+
   btnAgregarVariante.addEventListener('click', () => {
     contenedorVariantes.insertAdjacentHTML('beforeend', renderNuevaVariantRow());
     const nuevaFila = contenedorVariantes.lastElementChild;
+    aplicarEstadoDescuentoVariante(nuevaFila);
     // Solo las filas nuevas (aún no guardadas) se pueden quitar
     // libremente del formulario — no existen en la base de datos
     // todavía, así que no hay ningún riesgo de romper un historial.
@@ -200,6 +229,7 @@ export function activarProductoAdminCard(card) {
         const size_label = fila.querySelector('[data-field="size_label"]').value.trim();
         const type = fila.querySelector('[data-field="type"]').value;
         const price = Number(fila.querySelector('[data-field="price"]').value);
+        const discount_percentage = type === 'completo' ? Math.max(0, Math.min(100, Number(fila.querySelector('[data-field="discount_percentage"]').value || 0))) : 0;
         const available = fila.querySelector('[data-field="available"]').checked;
 
         if (!size_label || !(price > 0)) {
@@ -208,7 +238,7 @@ export function activarProductoAdminCard(card) {
 
         const { error: errorVariante } = await supabaseClient
           .from('variants')
-          .update({ size_label, type, price, available })
+          .update({ size_label, type, price, discount_percentage, available })
           .eq('id', variantId);
 
         if (errorVariante) throw errorVariante;
@@ -223,10 +253,11 @@ export function activarProductoAdminCard(card) {
         const size_label = fila.querySelector('[data-field="size_label"]').value.trim();
         const type = fila.querySelector('[data-field="type"]').value;
         const price = Number(fila.querySelector('[data-field="price"]').value);
+        const discount_percentage = type === 'completo' ? Math.max(0, Math.min(100, Number(fila.querySelector('[data-field="discount_percentage"]').value || 0))) : 0;
         const available = fila.querySelector('[data-field="available"]').checked;
 
         if (size_label && price > 0) {
-          nuevasAInsertar.push({ product_id: productId, size_label, type, price, available });
+          nuevasAInsertar.push({ product_id: productId, size_label, type, price, discount_percentage, available });
         }
       });
 

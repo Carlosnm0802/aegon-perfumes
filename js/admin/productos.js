@@ -21,7 +21,7 @@ async function cargarProductos() {
           id, name, description, image_url, gender, category_id, brand_id, is_active, is_new_arrival, is_bestseller,
           brand:brands(name),
           category:categories(name),
-          variants(id, size_label, type, price, available)
+          variants(id, size_label, type, price, discount_percentage, available)
         `)
         .order('created_at', { ascending: false }),
       supabaseClient.from('categories').select('id, name').order('name'),

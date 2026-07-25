@@ -73,7 +73,7 @@ async function cargarProductosPorMarca(slug) {
     .select(`
       id, name, image_url,
       brand:brands!inner(name, slug),
-      variants(id, size_label, price, available, type)
+      variants(id, size_label, price, discount_percentage, available, type)
     `)
     .eq('brand.slug', slug)
     .order('created_at', { ascending: false });

@@ -63,6 +63,7 @@ create table variants (
   product_id uuid not null references products(id) on delete cascade,
   size_label text not null,
   price numeric(10,2) not null check (price >= 0),
+  discount_percentage numeric(5,2) not null default 0 check (discount_percentage >= 0 and discount_percentage <= 100),
   available boolean not null default true
 );
 alter table variants enable row level security;

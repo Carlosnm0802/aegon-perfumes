@@ -1,4 +1,4 @@
-import { formatearPrecio } from '../utils/format.js';
+import { formatearPrecio, calcularPrecioConDescuento, formatearDescuento } from '../utils/format.js';
 import { agregarAlCarrito } from '../cart.js';
 
 // ============================================================
@@ -14,30 +14,58 @@ export function renderProductCard(product) {
   const primera = variantes[0];
   const tipoProducto = primera?.type ?? 'completo';
 
-  const pills = variantes.map((v, i) => `
-    <button class="variant-pill"
-            data-variant-id="${v.id}"
-            data-price="${v.price}"
-            data-type="${v.type ?? tipoProducto}"
-            aria-pressed="${i === 0}"
-            ${!v.available ? 'disabled' : ''}>
-      ${v.size_label}
-    </button>
-  `).join('');
+  const pills = variantes.map((v, i) => {
+    const tipo = v.type ?? tipoProducto;
+    const descuento = Number(v.discount_percentage ?? 0);
+    const precioFinal = calcularPrecioConDescuento(v.price, descuento, tipo);
+    const tieneDescuento = tipo === 'completo' && descuento > 0;
 
-  const precioInicial = primera ? formatearPrecio(primera.price) : '—';
+    return `
+      <button class="variant-pill"
+              data-variant-id="${v.id}"
+              data-price="${precioFinal}"
+              data-original-price="${v.price}"
+              data-discount-percentage="${descuento}"
+              data-type="${tipo}"
+              aria-pressed="${i === 0}"
+              ${!v.available ? 'disabled' : ''}>
+        ${v.size_label}
+      </button>
+    `;
+  }).join('');
+
+  const precioInicial = primera ? calcularPrecioConDescuento(primera.price, Number(primera?.discount_percentage ?? 0), primera.type ?? tipoProducto) : null;
+  const descuentoInicial = Number(primera?.discount_percentage ?? 0);
+  const tieneDescuentoInicial = (primera?.type ?? tipoProducto) === 'completo' && descuentoInicial > 0;
+  const descuentoTextoInicial = tieneDescuentoInicial ? formatearDescuento(descuentoInicial) : '';
+  const ahorroInicial = tieneDescuentoInicial ? Number(primera.price) - Number(precioInicial) : 0;
+
+  // Encontrar el máximo descuento entre todas las variantes "completo"
+  const descuentoMaximo = Math.max(...variantes.map(v => {
+    const tipo = v.type ?? tipoProducto;
+    return tipo === 'completo' ? Number(v.discount_percentage ?? 0) : 0;
+  }), 0);
+  
+  const tieneDescuentoEnAlgunaVariante = descuentoMaximo > 0;
+  const badgeFlotante = tieneDescuentoEnAlgunaVariante ? formatearDescuento(descuentoMaximo) : '';
 
   return `
     <div class="product-card" data-product-id="${product.id}">
       <div class="product-card__image">
         <img src="${product.image_url}" alt="${product.name}" loading="lazy" width="440" height="440">
+        ${tieneDescuentoEnAlgunaVariante ? `<div class="product-card__floating-badge">${badgeFlotante}</div>` : ''}
       </div>
       <div class="product-card__body">
         <div class="product-card__brand">${product.brand?.name ?? ''}</div>
         <div class="product-card__name">${product.name}</div>
         <div class="product-card__badges">${renderBadge(tipoProducto)}</div>
         <div class="variant-selector">${pills}</div>
-        <div class="product-card__price">${precioInicial}</div>
+        <div class="product-card__price-block">
+          <div class="product-card__price">${precioInicial !== null ? formatearPrecio(precioInicial) : '—'}</div>
+          ${tieneDescuentoInicial ? `<div class="product-card__old-price">${formatearPrecio(primera.price)}</div>` : ''}
+          ${descuentoTextoInicial ? `<div class="product-card__discount">${descuentoTextoInicial}</div>` : ''}
+          ${tieneDescuentoInicial ? `<div class="product-card__savings">Ahorras ${formatearPrecio(ahorroInicial)}</div>` : ''}
+        </div>
         <button class="btn btn-primary" style="width:100%;">Agregar al carrito</button>
       </div>
     </div>
@@ -55,7 +83,11 @@ function renderBadge(type) {
 export function activarSelectorDeVariante(card) {
   const pills = card.querySelectorAll('.variant-pill');
   const precioEl = card.querySelector('.product-card__price');
+  const oldPriceEl = card.querySelector('.product-card__old-price');
+  const discountEl = card.querySelector('.product-card__discount');
+  const savingsEl = card.querySelector('.product-card__savings');
   const badgesEl = card.querySelector('.product-card__badges');
+  const floatingBadgeEl = card.querySelector('.product-card__floating-badge');
   const btnAgregar = card.querySelector('.product-card__body > .btn');
 
   pills.forEach(pill => {
@@ -63,7 +95,30 @@ export function activarSelectorDeVariante(card) {
       if (pill.disabled) return;
       pills.forEach(p => p.setAttribute('aria-pressed', 'false'));
       pill.setAttribute('aria-pressed', 'true');
-      precioEl.textContent = formatearPrecio(pill.dataset.price);
+
+      const precioFinal = Number(pill.dataset.price);
+      const precioOriginal = Number(pill.dataset.originalPrice);
+      const descuentoPct = Number(pill.dataset.discountPercentage ?? 0);
+      const tieneDescuento = pill.dataset.type === 'completo' && descuentoPct > 0;
+      const ahorro = tieneDescuento ? precioOriginal - precioFinal : 0;
+
+      precioEl.textContent = formatearPrecio(precioFinal);
+      if (oldPriceEl) {
+        oldPriceEl.textContent = tieneDescuento ? formatearPrecio(precioOriginal) : '';
+        oldPriceEl.hidden = !tieneDescuento;
+      }
+      if (discountEl) {
+        discountEl.textContent = tieneDescuento ? formatearDescuento(descuentoPct) : '';
+        discountEl.hidden = !tieneDescuento;
+      }
+      if (savingsEl) {
+        savingsEl.textContent = tieneDescuento ? `Ahorras ${formatearPrecio(ahorro)}` : '';
+        savingsEl.hidden = !tieneDescuento;
+      }
+      if (floatingBadgeEl) {
+        floatingBadgeEl.textContent = tieneDescuento ? formatearDescuento(descuentoPct) : '';
+        floatingBadgeEl.hidden = !tieneDescuento;
+      }
       badgesEl.innerHTML = renderBadge(pill.dataset.type);
     });
   });

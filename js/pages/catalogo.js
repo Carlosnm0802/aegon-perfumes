@@ -154,7 +154,7 @@ function construirConsulta() {
       id, name, image_url,
       brand:brands!inner(name, slug),
       category:categories!inner(name, slug),
-      variants!inner(id, size_label, price, available, type)
+      variants!inner(id, size_label, price, discount_percentage, available, type)
     `)
     .order('created_at', { ascending: false });
 

@@ -12,6 +12,24 @@ let contadorVariantes = 0;
 // Siempre queda al menos 1 fila visible.
 // ============================================================
 
+function aplicarEstadoDescuentoVariante(fila) {
+  const selectTipo = fila.querySelector('.variante-type');
+  const inputDescuento = fila.querySelector('.variante-discount-percentage');
+
+  if (!selectTipo || !inputDescuento) return;
+
+  const actualizar = () => {
+    const esCompleto = selectTipo.value === 'completo';
+    inputDescuento.disabled = !esCompleto;
+    if (!esCompleto) {
+      inputDescuento.value = '0';
+    }
+  };
+
+  selectTipo.addEventListener('change', actualizar);
+  actualizar();
+}
+
 function agregarFilaVariante() {
   const id = `variante-${contadorVariantes++}`;
   const contenedor = document.getElementById('variantes-container');
@@ -26,11 +44,17 @@ function agregarFilaVariante() {
       <option value="completo">Completo</option>
     </select>
     <input type="number" step="0.01" min="0" placeholder="Precio" class="variante-price" required>
+    <div class="admin-variant-form-row__discount-field">
+      <span class="admin-variant-form-row__discount-label">Descuento %</span>
+      <input type="number" step="0.01" min="0" max="100" value="0" placeholder="20" class="variante-discount-percentage" disabled>
+    </div>
     <label class="variante-available">
       <input type="checkbox" checked> Disponible
     </label>
     <button type="button" class="variante-quitar" aria-label="Quitar variante">✕</button>
   `;
+
+  aplicarEstadoDescuentoVariante(fila);
 
   fila.querySelector('.variante-quitar').addEventListener('click', () => {
     // Nunca dejamos el formulario sin ninguna fila — no tendría
@@ -49,11 +73,13 @@ function leerVariantesDelFormulario() {
 
   filas.forEach(fila => {
     const size_label = fila.querySelector('.variante-size-label').value.trim();
+    const type = fila.querySelector('.variante-type').value;
     const price = Number(fila.querySelector('.variante-price').value);
+    const discount_percentage = type === 'completo' ? Math.max(0, Math.min(100, Number(fila.querySelector('.variante-discount-percentage').value || 0))) : 0;
     const available = fila.querySelector('.variante-available input').checked;
 
     if (size_label && price > 0) {
-      variantes.push({ size_label, price, available });
+      variantes.push({ size_label, type, price, discount_percentage, available });
     }
   });
 
