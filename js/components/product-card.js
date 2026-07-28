@@ -10,18 +10,20 @@ import { agregarAlCarrito } from '../cart.js';
 // ============================================================
 
 export function renderProductCard(product) {
+  const productoActivo = product.is_active !== false;
   const variantes = [...product.variants].sort((a, b) => a.price - b.price);
   const varianteDestacada = variantes.find(v => {
     const tipo = v.type ?? 'completo';
-    return tipo === 'completo' && Number(v.discount_percentage ?? 0) > 0;
-  }) ?? variantes[0];
+    return v.available && tipo === 'completo' && Number(v.discount_percentage ?? 0) > 0;
+  }) ?? variantes.find(v => v.available) ?? variantes[0];
   const tipoProducto = varianteDestacada?.type ?? 'completo';
+  const tieneVariantesDisponibles = variantes.some(v => v.available);
+  const disponibleParaCompra = productoActivo && tieneVariantesDisponibles;
 
   const pills = variantes.map((v, i) => {
     const tipo = v.type ?? tipoProducto;
     const descuento = Number(v.discount_percentage ?? 0);
     const precioFinal = calcularPrecioConDescuento(v.price, descuento, tipo);
-    const tieneDescuento = tipo === 'completo' && descuento > 0;
 
     return `
       <button class="variant-pill"
@@ -31,7 +33,7 @@ export function renderProductCard(product) {
               data-discount-percentage="${descuento}"
               data-type="${tipo}"
               aria-pressed="${v.id === varianteDestacada?.id}"
-              ${!v.available ? 'disabled' : ''}>
+              ${(!disponibleParaCompra || !v.available) ? 'disabled' : ''}>
         ${v.size_label}
       </button>
     `;
@@ -39,12 +41,12 @@ export function renderProductCard(product) {
 
   const precioInicial = varianteDestacada ? calcularPrecioConDescuento(varianteDestacada.price, Number(varianteDestacada?.discount_percentage ?? 0), varianteDestacada.type ?? tipoProducto) : null;
   const descuentoInicial = Number(varianteDestacada?.discount_percentage ?? 0);
-  const tieneDescuentoInicial = (varianteDestacada?.type ?? tipoProducto) === 'completo' && descuentoInicial > 0;
+  const tieneDescuentoInicial = disponibleParaCompra && (varianteDestacada?.type ?? tipoProducto) === 'completo' && descuentoInicial > 0;
   const descuentoTextoInicial = tieneDescuentoInicial ? formatearDescuento(descuentoInicial) : '';
   const ahorroInicial = tieneDescuentoInicial ? Number(varianteDestacada.price) - Number(precioInicial) : 0;
 
   return `
-    <div class="product-card" data-product-id="${product.id}">
+    <div class="product-card ${!disponibleParaCompra ? 'product-card--unavailable' : ''}" data-product-id="${product.id}">
       <div class="product-card__image">
         <img src="${product.image_url}" alt="${product.name}" loading="lazy" width="440" height="440">
         ${tieneDescuentoInicial ? `<div class="product-card__floating-badge">${descuentoTextoInicial}</div>` : ''}
@@ -52,7 +54,7 @@ export function renderProductCard(product) {
       <div class="product-card__body">
         <div class="product-card__brand">${product.brand?.name ?? ''}</div>
         <div class="product-card__name">${product.name}</div>
-        <div class="product-card__badges">${renderBadge(tipoProducto)}</div>
+        <div class="product-card__badges">${renderBadge(tipoProducto, disponibleParaCompra)}</div>
         <div class="variant-selector">${pills}</div>
         <div class="product-card__price-block">
           <div class="product-card__price">${precioInicial !== null ? formatearPrecio(precioInicial) : '—'}</div>
@@ -60,16 +62,19 @@ export function renderProductCard(product) {
           ${descuentoTextoInicial ? `<div class="product-card__discount">${descuentoTextoInicial}</div>` : ''}
           ${tieneDescuentoInicial ? `<div class="product-card__savings">Ahorras ${formatearPrecio(ahorroInicial)}</div>` : ''}
         </div>
-        <button class="btn btn-primary" style="width:100%;">Agregar al carrito</button>
+        <button class="btn btn-primary" style="width:100%;" ${!disponibleParaCompra ? 'disabled' : ''}>${disponibleParaCompra ? 'Agregar al carrito' : 'No disponible'}</button>
       </div>
     </div>
   `;
 }
 
-function renderBadge(type) {
+function renderBadge(type, disponibleParaCompra) {
   const badgeClass = type === 'decant' ? 'badge-decant' : 'badge-original';
   const badgeLabel = type === 'decant' ? 'Decant' : 'Completo';
-  return `<span class="badge ${badgeClass}">${badgeLabel}</span>`;
+  const badgeNoDisponible = !disponibleParaCompra
+    ? '<span class="badge badge-unavailable">No disponible</span>'
+    : '';
+  return `<span class="badge ${badgeClass}">${badgeLabel}</span>${badgeNoDisponible}`;
 }
 
 // Activa el selector de variante Y el botón de agregar al

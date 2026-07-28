@@ -107,6 +107,7 @@ async function validarYDepurarCarrito(carrito) {
     const variante = vigentesPorId.get(item.variantId);
     if (!variante) return true;
     if (!variante.available) return true;
+    if (variante.product?.is_active === false) return true;
     return false;
   });
 

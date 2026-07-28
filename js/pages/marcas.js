@@ -75,6 +75,7 @@ async function cargarProductosPorMarca(slug) {
       brand:brands!inner(name, slug),
       variants(id, size_label, price, discount_percentage, available, type)
     `)
+    .eq('is_active', true)
     .eq('brand.slug', slug)
     .order('created_at', { ascending: false });
 

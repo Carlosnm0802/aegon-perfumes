@@ -151,7 +151,7 @@ function construirConsulta() {
   let query = supabaseClient
     .from('products')
     .select(`
-      id, name, image_url,
+      id, name, image_url, is_active,
       brand:brands!inner(name, slug),
       category:categories!inner(name, slug),
       variants!inner(id, size_label, price, discount_percentage, available, type)

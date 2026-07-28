@@ -218,6 +218,12 @@ a:hover { color: var(--color-accent-hover); }
   color: var(--color-text-on-accent);
 }
 
+.badge-unavailable {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-secondary);
+  border: 1px dashed var(--color-border);
+}
+
 /* ============================================================
    TARJETA DE PRODUCTO
    ============================================================
@@ -237,6 +243,15 @@ a:hover { color: var(--color-accent-hover); }
 .product-card:hover {
   box-shadow: var(--shadow-glow);
   border-color: rgba(197, 160, 89, 0.4);
+}
+
+.product-card--unavailable {
+  opacity: 0.82;
+}
+
+.product-card--unavailable:hover {
+  box-shadow: none;
+  border-color: var(--color-border);
 }
 
 .product-card__image {

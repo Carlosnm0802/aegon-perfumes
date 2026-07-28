@@ -148,6 +148,7 @@ async function cargarMasVendidos() {
   const { data: destacados, error } = await supabaseClient
     .from('products')
     .select(consultaBase)
+    .eq('is_active', true)
     .eq('is_bestseller', true)
     .order('created_at', { ascending: false })
     .limit(4);
@@ -164,6 +165,7 @@ async function cargarMasVendidos() {
     const { data: fallback, error: fallbackError } = await supabaseClient
       .from('products')
       .select(consultaBase)
+      .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(4);
 
@@ -195,6 +197,7 @@ async function cargarRecienLlegados() {
   const { data: destacados, error } = await supabaseClient
     .from('products')
     .select(consultaBase)
+    .eq('is_active', true)
     .eq('is_new_arrival', true)
     .order('created_at', { ascending: false })
     .limit(4);
@@ -211,6 +214,7 @@ async function cargarRecienLlegados() {
     const { data: recientes, error: errorRecientes } = await supabaseClient
       .from('products')
       .select(consultaBase)
+      .eq('is_active', true)
       .order('created_at', { ascending: false })
       .limit(4);
 

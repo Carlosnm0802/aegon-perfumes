@@ -103,10 +103,11 @@ create policy "brands: lectura pública"
   on brands for select
   using (true);
 
--- ---------- products: lectura pública SOLO de productos activos ----------
-create policy "products: lectura pública de activos"
+-- ---------- products: lectura pública ----------
+-- El frontend decide cómo presentar inactivos (ej. "No disponible").
+create policy "products: lectura pública"
   on products for select
-  using (is_active = true);
+  using (true);
 
 -- ---------- variants: lectura pública ----------
 -- Nota: no filtramos por "available" aquí — el frontend decide si muestra
