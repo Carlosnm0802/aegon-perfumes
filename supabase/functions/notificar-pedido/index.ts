@@ -19,6 +19,7 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
 
 const BASE_URL = "https://api.resend.com/emails";
 const DEFAULT_FROM = "Aegon Perfumes <onboarding@resend.dev>";
+const DEFAULT_WHATSAPP_NUMBER = "521234567890";
 
 function shortOrderId(orderId: string) {
   return orderId.split("-")[0].toUpperCase();
@@ -51,6 +52,16 @@ function formatDelivery(deliveryType: string) {
   if (deliveryType === "envio_local") return "Envío local";
   if (deliveryType === "paqueteria") return "Paquetería nacional";
   return deliveryType;
+}
+
+function normalizePhoneToDigits(value: string | null | undefined) {
+  return (value ?? "").replace(/\D/g, "");
+}
+
+function buildWhatsappUrl(phone: string, orderId: string) {
+  const cleanPhone = normalizePhoneToDigits(phone) || DEFAULT_WHATSAPP_NUMBER;
+  const text = encodeURIComponent(`Hola, tengo una duda sobre mi pedido #${shortOrderId(orderId)}.`);
+  return `https://wa.me/${cleanPhone}?text=${text}`;
 }
 
 function buildMessageByEvent(eventType: NotifyEvent, statusTo: OrderStatus, orderId: string) {
@@ -105,12 +116,13 @@ function buildEmailHtml(args: {
   orderId: string;
   statusTo: OrderStatus;
   eventType: NotifyEvent;
+  whatsappUrl: string;
   deliveryType: string;
   deliveryAddress: string | null;
   total: number;
   items: Array<{ name: string; sizeLabel: string; quantity: number; unitPrice: number }>;
 }) {
-  const { customerName, orderId, statusTo, eventType, deliveryType, deliveryAddress, total, items } = args;
+  const { customerName, orderId, statusTo, eventType, whatsappUrl, deliveryType, deliveryAddress, total, items } = args;
   const copy = buildMessageByEvent(eventType, statusTo, orderId);
 
   const itemsHtml = items
@@ -159,6 +171,17 @@ function buildEmailHtml(args: {
 
           <div style="margin-top:10px;padding-top:10px;border-top:1px solid #ececf1;text-align:right;font-size:16px;color:#121214;">
             <strong>Total: ${formatMoney(total)}</strong>
+          </div>
+
+          <div style="margin-top:18px;">
+            <a
+              href="${escapeHtml(whatsappUrl)}"
+              target="_blank"
+              rel="noopener"
+              style="display:inline-block;padding:12px 16px;background:#25D366;color:#ffffff;text-decoration:none;font-weight:600;border-radius:8px;font-size:14px;"
+            >
+              Contactar por WhatsApp
+            </a>
           </div>
         </td>
       </tr>
@@ -281,11 +304,21 @@ Deno.serve(async (req) => {
       unitPrice: Number(item.unit_price),
     }));
 
+    const { data: settingsData } = await supabaseAdmin
+      .from("settings")
+      .select("whatsapp_number")
+      .limit(1)
+      .maybeSingle();
+
+    const whatsappNumber = settingsData?.whatsapp_number || Deno.env.get("ORDER_WHATSAPP_NUMBER") || DEFAULT_WHATSAPP_NUMBER;
+    const whatsappUrl = buildWhatsappUrl(whatsappNumber, order.id);
+
     const emailPayload = buildEmailHtml({
       customerName: order.customer_name,
       orderId: order.id,
       statusTo: effectiveStatus,
       eventType: normalizedEventType,
+      whatsappUrl,
       deliveryType: order.delivery_type,
       deliveryAddress: order.delivery_address,
       total: Number(order.total),
