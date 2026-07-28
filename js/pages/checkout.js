@@ -1,6 +1,6 @@
 import { supabaseClient } from '../supabase-client.js';
 import { renderLayout } from '../components/layout.js';
-import { obtenerCarrito, calcularTotal, vaciarCarrito } from '../cart.js';
+import { obtenerCarrito, calcularTotal, vaciarCarrito, eliminarDelCarrito } from '../cart.js';
 import { formatearPrecio } from '../utils/format.js';
 import { obtenerDatosTransferencia } from '../settings.js';
 
@@ -61,6 +61,61 @@ function mostrarError(mensaje) {
 
 function ocultarError() {
   document.getElementById('checkout-error').hidden = true;
+}
+
+function actualizarVistaCheckoutSegunCarrito(carrito) {
+  const vacio = carrito.length === 0;
+  document.getElementById('checkout-empty').hidden = !vacio;
+  document.getElementById('checkout-content').hidden = vacio;
+}
+
+function construirMensajeItemsInactivos(removidos) {
+  const etiquetas = [...new Set(removidos.map(item => `${item.name} (${item.sizeLabel})`))];
+  if (etiquetas.length === 0) {
+    return 'Actualizamos tu carrito: algunos productos ya no están disponibles.';
+  }
+
+  const vistaPrevia = etiquetas.slice(0, 2).join(', ');
+  const restantes = etiquetas.length - 2;
+  const sufijo = restantes > 0 ? ` y ${restantes} más` : '';
+
+  return `Actualizamos tu carrito: quitamos productos no disponibles (${vistaPrevia}${sufijo}).`;
+}
+
+async function validarYDepurarCarrito(carrito) {
+  if (!Array.isArray(carrito) || carrito.length === 0) {
+    return { carritoValido: [], removidos: [] };
+  }
+
+  const variantIds = [...new Set(carrito.map(item => item.variantId).filter(Boolean))];
+  if (variantIds.length === 0) {
+    return { carritoValido: [], removidos: [...carrito] };
+  }
+
+  const { data: variantesVigentes, error } = await supabaseClient
+    .from('variants')
+    .select('id, available, product:products!inner(id, name, is_active)')
+    .in('id', variantIds);
+
+  if (error) {
+    throw error;
+  }
+
+  const vigentesPorId = new Map((variantesVigentes ?? []).map(v => [v.id, v]));
+
+  const removidos = carrito.filter(item => {
+    const variante = vigentesPorId.get(item.variantId);
+    if (!variante) return true;
+    if (!variante.available) return true;
+    return false;
+  });
+
+  if (removidos.length > 0) {
+    const idsRemovidos = [...new Set(removidos.map(item => item.variantId))];
+    idsRemovidos.forEach(id => eliminarDelCarrito(id));
+  }
+
+  return { carritoValido: obtenerCarrito(), removidos };
 }
 
 function renderDatosTransferencia(datos) {
@@ -141,14 +196,25 @@ async function guardarPedido(datosCliente, carrito) {
 async function iniciarCheckout() {
   await renderLayout();
 
-  const carrito = obtenerCarrito();
+  let carrito = obtenerCarrito();
+
+  try {
+    const { carritoValido, removidos } = await validarYDepurarCarrito(carrito);
+    carrito = carritoValido;
+    if (removidos.length > 0) {
+      mostrarError(construirMensajeItemsInactivos(removidos));
+    }
+  } catch (error) {
+    console.error('Error validando productos del carrito:', error);
+    mostrarError('No pudimos validar disponibilidad de productos. Intenta de nuevo en unos segundos.');
+  }
 
   if (carrito.length === 0) {
-    document.getElementById('checkout-empty').hidden = false;
+    actualizarVistaCheckoutSegunCarrito(carrito);
     return;
   }
 
-  document.getElementById('checkout-content').hidden = false;
+  actualizarVistaCheckoutSegunCarrito(carrito);
   renderResumenPedido(carrito);
   activarCampoDireccion();
   renderDatosTransferencia(await obtenerDatosTransferencia());
@@ -183,7 +249,25 @@ async function iniciarCheckout() {
     btnConfirmar.textContent = 'Guardando pedido...';
 
     try {
-      const carritoActual = obtenerCarrito();
+      const { carritoValido: carritoActual, removidos } = await validarYDepurarCarrito(obtenerCarrito());
+
+      if (removidos.length > 0) {
+        renderResumenPedido(carritoActual);
+        actualizarVistaCheckoutSegunCarrito(carritoActual);
+        mostrarError(construirMensajeItemsInactivos(removidos));
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = 'Confirmar pedido';
+        return;
+      }
+
+      if (carritoActual.length === 0) {
+        actualizarVistaCheckoutSegunCarrito(carritoActual);
+        mostrarError('Tu carrito quedó vacío porque los productos ya no están disponibles.');
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = 'Confirmar pedido';
+        return;
+      }
+
       const pedido = await guardarPedido(datosCliente, carritoActual);
 
       if (datosCliente.payment_method === 'transferencia') {
