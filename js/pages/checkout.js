@@ -191,6 +191,23 @@ async function guardarPedido(datosCliente, carrito) {
   return { id: orderId };
 }
 
+async function notificarCreacionPedido(orderId) {
+  try {
+    const { error } = await supabaseClient.functions.invoke('notificar-pedido', {
+      body: {
+        orderId,
+        eventType: 'created',
+      },
+    });
+
+    if (error) {
+      console.warn('No se pudo enviar correo de pedido creado:', error);
+    }
+  } catch (error) {
+    console.warn('Fallo inesperado enviando correo de pedido creado:', error);
+  }
+}
+
 // ============================================================
 // INICIALIZACIÓN
 // ============================================================
@@ -270,6 +287,7 @@ async function iniciarCheckout() {
       }
 
       const pedido = await guardarPedido(datosCliente, carritoActual);
+      await notificarCreacionPedido(pedido.id);
 
       if (datosCliente.payment_method === 'transferencia') {
         vaciarCarrito();

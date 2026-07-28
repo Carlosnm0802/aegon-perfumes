@@ -94,6 +94,7 @@ function activarPedidoCard(card) {
     btnGuardar.textContent = 'Guardando...';
 
     const nuevoEstado = selectEstado.value;
+    const estadoAnterior = badgeEstado.textContent?.trim();
     const { error } = await supabaseClient
       .from('orders')
       .update({ status: nuevoEstado })
@@ -105,7 +106,26 @@ function activarPedidoCard(card) {
     } else {
       badgeEstado.textContent = nuevoEstado;
       badgeEstado.className = `status-pill status-${nuevoEstado}`;
-      estadoGuardado.textContent = '✓ Actualizado';
+
+      const { data: notificacion, error: errorNotificacion } = await supabaseClient.functions.invoke('notificar-pedido', {
+        body: {
+          orderId: pedidoId,
+          eventType: 'status_changed',
+          statusTo: nuevoEstado,
+          previousStatus: estadoAnterior,
+        },
+      });
+
+      if (errorNotificacion) {
+        console.warn('Estado actualizado, pero falló notificación:', errorNotificacion);
+        estadoGuardado.textContent = '✓ Estado actualizado. Correo no enviado.';
+      } else if (notificacion?.warning) {
+        estadoGuardado.textContent = `✓ Estado actualizado. ${notificacion.warning}`;
+      } else if (notificacion?.duplicate) {
+        estadoGuardado.textContent = '✓ Actualizado. Correo ya enviado antes.';
+      } else {
+        estadoGuardado.textContent = '✓ Actualizado y correo enviado';
+      }
     }
 
     estadoGuardado.hidden = false;
