@@ -99,6 +99,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body.menu-open {
+  overflow: hidden;
+}
+
 h1, h2, h3 {
   font-family: var(--font-display);
   font-weight: var(--fw-medium);
@@ -505,8 +509,10 @@ a:hover { color: var(--color-accent-hover); }
    ============================================================ */
 
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 30;
   display: flex;
   align-items: center;
@@ -515,6 +521,11 @@ a:hover { color: var(--color-accent-hover); }
   background-color: rgba(18, 18, 20, 0.92);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--color-border);
+}
+
+/* Compensa el espacio del navbar fijo en páginas públicas. */
+#navbar-container + * {
+  margin-top: 76px;
 }
 
 .navbar__logo {
@@ -589,7 +600,7 @@ a:hover { color: var(--color-accent-hover); }
 .navbar-menu-overlay {
   position: fixed;
   inset: 0;
-  background: var(--color-overlay);
+  background: rgba(8, 8, 9, 0.88);
   opacity: 0;
   pointer-events: none;
   transition: opacity var(--transition-base);
@@ -608,14 +619,18 @@ a:hover { color: var(--color-accent-hover); }
   bottom: 0;
   width: min(330px, 92vw);
   padding: calc(var(--space-7) + var(--space-3)) var(--space-5) var(--space-5);
-  background: linear-gradient(180deg, rgba(26, 26, 30, 0.98) 0%, rgba(18, 18, 20, 0.98) 100%);
+  background-color: var(--color-surface);
+  background-image: linear-gradient(180deg, #1A1A1E 0%, #121214 100%);
   border-left: 1px solid var(--color-border);
+  box-shadow: -24px 0 48px rgba(0, 0, 0, 0.45);
   transform: translateX(105%);
   transition: transform var(--transition-base);
   z-index: 33;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .navbar-menu.is-visible {

@@ -77,15 +77,21 @@ export function activarNavbarMenu() {
 
   if (!boton || !menu || !overlay) return;
 
+  // Evita recortes visuales cuando el header crea su propio contexto.
+  if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
+  if (menu.parentElement !== document.body) document.body.appendChild(menu);
+
   function abrir() {
     menu.classList.add('is-visible');
     overlay.classList.add('is-visible');
+    document.body.classList.add('menu-open');
     boton.setAttribute('aria-expanded', 'true');
   }
 
   function cerrar() {
     menu.classList.remove('is-visible');
     overlay.classList.remove('is-visible');
+    document.body.classList.remove('menu-open');
     boton.setAttribute('aria-expanded', 'false');
   }
 
