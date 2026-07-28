@@ -12,6 +12,10 @@ import { supabaseClient } from '../supabase-client.js';
 const form = document.getElementById('login-form');
 const btnEntrar = document.getElementById('btn-entrar');
 const errorEl = document.getElementById('login-error');
+const passwordInput = document.getElementById('input-password');
+const togglePasswordBtn = document.getElementById('toggle-password');
+const iconEyeOpen = document.getElementById('icon-eye-open');
+const iconEyeClosed = document.getElementById('icon-eye-closed');
 
 // Si ya hay una sesión activa (el usuario volvió a esta página
 // por error, o el navegador recordó su sesión), no tiene sentido
@@ -28,7 +32,7 @@ form.addEventListener('submit', async (e) => {
   errorEl.hidden = true;
 
   const email = document.getElementById('input-email').value.trim();
-  const password = document.getElementById('input-password').value;
+  const password = passwordInput.value;
 
   btnEntrar.disabled = true;
   btnEntrar.textContent = 'Entrando...';
@@ -45,5 +49,20 @@ form.addEventListener('submit', async (e) => {
 
   window.location.href = 'index.html';
 });
+
+if (togglePasswordBtn && passwordInput) {
+  togglePasswordBtn.addEventListener('click', () => {
+    const mostrando = passwordInput.type === 'text';
+    passwordInput.type = mostrando ? 'password' : 'text';
+
+    togglePasswordBtn.setAttribute('aria-pressed', String(!mostrando));
+    togglePasswordBtn.setAttribute('aria-label', mostrando ? 'Mostrar contraseña' : 'Ocultar contraseña');
+
+    if (iconEyeOpen && iconEyeClosed) {
+      iconEyeOpen.hidden = !mostrando;
+      iconEyeClosed.hidden = mostrando;
+    }
+  });
+}
 
 redirigirSiYaHaySesion();

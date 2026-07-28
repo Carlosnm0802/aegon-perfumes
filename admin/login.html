@@ -23,7 +23,30 @@
 
       <div class="form-field">
         <label for="input-password">Contraseña</label>
-        <input type="password" id="input-password" required autocomplete="current-password">
+        <div class="password-input-wrap">
+          <input type="password" id="input-password" required autocomplete="current-password">
+          <button
+            type="button"
+            class="password-toggle"
+            id="toggle-password"
+            aria-label="Mostrar contraseña"
+            aria-controls="input-password"
+            aria-pressed="false"
+          >
+            <span class="password-toggle__icon" aria-hidden="true">
+              <svg id="icon-eye-open" viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 12C3.9 8.2 7.5 6 12 6C16.5 6 20.1 8.2 22 12C20.1 15.8 16.5 18 12 18C7.5 18 3.9 15.8 2 12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+              </svg>
+              <svg id="icon-eye-closed" viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg" hidden>
+                <path d="M3 3L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M10.6 10.7C10.2 11.1 10 11.5 10 12C10 13.1 10.9 14 12 14C12.5 14 12.9 13.8 13.3 13.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M6.7 6.8C5 8 3.6 9.8 2.7 12C4.6 15.8 8.2 18 12.7 18C14.8 18 16.7 17.5 18.3 16.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M9.9 6.1C10.6 6 11.3 6 12 6C16.5 6 20.1 8.2 22 12C21.4 13.3 20.6 14.5 19.6 15.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+        </div>
       </div>
 
       <div id="login-error" class="checkout-error" hidden></div>
