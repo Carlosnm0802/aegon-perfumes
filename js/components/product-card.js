@@ -11,8 +11,11 @@ import { agregarAlCarrito } from '../cart.js';
 
 export function renderProductCard(product) {
   const variantes = [...product.variants].sort((a, b) => a.price - b.price);
-  const primera = variantes[0];
-  const tipoProducto = primera?.type ?? 'completo';
+  const varianteDestacada = variantes.find(v => {
+    const tipo = v.type ?? 'completo';
+    return tipo === 'completo' && Number(v.discount_percentage ?? 0) > 0;
+  }) ?? variantes[0];
+  const tipoProducto = varianteDestacada?.type ?? 'completo';
 
   const pills = variantes.map((v, i) => {
     const tipo = v.type ?? tipoProducto;
@@ -27,33 +30,24 @@ export function renderProductCard(product) {
               data-original-price="${v.price}"
               data-discount-percentage="${descuento}"
               data-type="${tipo}"
-              aria-pressed="${i === 0}"
+              aria-pressed="${v.id === varianteDestacada?.id}"
               ${!v.available ? 'disabled' : ''}>
         ${v.size_label}
       </button>
     `;
   }).join('');
 
-  const precioInicial = primera ? calcularPrecioConDescuento(primera.price, Number(primera?.discount_percentage ?? 0), primera.type ?? tipoProducto) : null;
-  const descuentoInicial = Number(primera?.discount_percentage ?? 0);
-  const tieneDescuentoInicial = (primera?.type ?? tipoProducto) === 'completo' && descuentoInicial > 0;
+  const precioInicial = varianteDestacada ? calcularPrecioConDescuento(varianteDestacada.price, Number(varianteDestacada?.discount_percentage ?? 0), varianteDestacada.type ?? tipoProducto) : null;
+  const descuentoInicial = Number(varianteDestacada?.discount_percentage ?? 0);
+  const tieneDescuentoInicial = (varianteDestacada?.type ?? tipoProducto) === 'completo' && descuentoInicial > 0;
   const descuentoTextoInicial = tieneDescuentoInicial ? formatearDescuento(descuentoInicial) : '';
-  const ahorroInicial = tieneDescuentoInicial ? Number(primera.price) - Number(precioInicial) : 0;
-
-  // Encontrar el máximo descuento entre todas las variantes "completo"
-  const descuentoMaximo = Math.max(...variantes.map(v => {
-    const tipo = v.type ?? tipoProducto;
-    return tipo === 'completo' ? Number(v.discount_percentage ?? 0) : 0;
-  }), 0);
-  
-  const tieneDescuentoEnAlgunaVariante = descuentoMaximo > 0;
-  const badgeFlotante = tieneDescuentoEnAlgunaVariante ? formatearDescuento(descuentoMaximo) : '';
+  const ahorroInicial = tieneDescuentoInicial ? Number(varianteDestacada.price) - Number(precioInicial) : 0;
 
   return `
     <div class="product-card" data-product-id="${product.id}">
       <div class="product-card__image">
         <img src="${product.image_url}" alt="${product.name}" loading="lazy" width="440" height="440">
-        ${tieneDescuentoEnAlgunaVariante ? `<div class="product-card__floating-badge">${badgeFlotante}</div>` : ''}
+        ${tieneDescuentoInicial ? `<div class="product-card__floating-badge">${descuentoTextoInicial}</div>` : ''}
       </div>
       <div class="product-card__body">
         <div class="product-card__brand">${product.brand?.name ?? ''}</div>
@@ -62,7 +56,7 @@ export function renderProductCard(product) {
         <div class="variant-selector">${pills}</div>
         <div class="product-card__price-block">
           <div class="product-card__price">${precioInicial !== null ? formatearPrecio(precioInicial) : '—'}</div>
-          ${tieneDescuentoInicial ? `<div class="product-card__old-price">${formatearPrecio(primera.price)}</div>` : ''}
+          ${tieneDescuentoInicial ? `<div class="product-card__old-price">${formatearPrecio(varianteDestacada.price)}</div>` : ''}
           ${descuentoTextoInicial ? `<div class="product-card__discount">${descuentoTextoInicial}</div>` : ''}
           ${tieneDescuentoInicial ? `<div class="product-card__savings">Ahorras ${formatearPrecio(ahorroInicial)}</div>` : ''}
         </div>
