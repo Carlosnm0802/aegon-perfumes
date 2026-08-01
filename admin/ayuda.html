@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ayuda — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<div class="container admin-content">
+  <h1 class="section__title">Ayuda</h1>
+  <p class="ayuda-intro">
+    Aquí encuentras cómo hacer lo más común en tu tienda: agregar productos,
+    marcar algo como agotado y gestionar tus pedidos. Toca cualquier pregunta
+    para ver los pasos.
+  </p>
+
+  <!-- ============ PRODUCTOS ============ -->
+  <div class="ayuda-grupo">
+    <h2 class="ayuda-grupo__titulo">Productos</h2>
+
+    <details class="ayuda-item" open>
+      <summary class="ayuda-item__pregunta">¿Cómo agrego un perfume nuevo?</summary>
+      <div class="ayuda-item__respuesta">
+        <ol>
+          <li>En el menú, entra a <strong>"Nuevo producto"</strong>.</li>
+          <li>Llena el nombre, la descripción, género, categoría y marca.</li>
+          <li>La foto es opcional en este paso — puedes crear el producto primero y subirla después desde la lista de productos.</li>
+          <li>Baja hasta <strong>"Variantes (tamaños y precios)"</strong> y toca <strong>"+ Agregar variante"</strong> por cada presentación que vendas (por ejemplo, decant de 5ml y frasco completo de 100ml), con su precio.</li>
+          <li>Si quieres que aparezca en la sección de "Recién llegado" o "Más vendido" en la tienda, marca esas casillas.</li>
+          <li>Toca <strong>"Crear producto"</strong> al final.</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">¿Cómo cambio el precio o la descripción de un perfume que ya existe?</summary>
+      <div class="ayuda-item__respuesta">
+        <ol>
+          <li>Entra a <strong>"Productos"</strong> en el menú — ahí ves todo tu catálogo.</li>
+          <li>Busca el perfume (puedes escribir su nombre en el buscador de arriba).</li>
+          <li>Toca la tarjeta del producto para que se abra y muestre todos sus datos.</li>
+          <li>Cambia lo que necesites: nombre, descripción, precio de cualquier tamaño, etc.</li>
+          <li>Toca <strong>"Guardar cambios"</strong> al final de la tarjeta. Ese único botón guarda todo — el producto y todos sus tamaños a la vez.</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">¿Cómo cambio la foto de un perfume?</summary>
+      <div class="ayuda-item__respuesta">
+        <ol>
+          <li>Entra a <strong>"Productos"</strong> y busca el perfume.</li>
+          <li>Toca la foto pequeña del producto — vas a ver el texto <strong>"Cambiar foto"</strong> encima.</li>
+          <li>Elige la nueva imagen desde tu celular o computadora. Se sube sola, no necesitas guardar nada más.</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">¿Cómo marco un tamaño como agotado?</summary>
+      <div class="ayuda-item__respuesta">
+        <p>Esto es distinto a ocultar el producto completo — es solo para cuando un tamaño específico se te acabó (por ejemplo, ya no tienes el decant de 5ml pero sí el frasco completo).</p>
+        <ol>
+          <li>Entra a <strong>"Productos"</strong> y abre la tarjeta del perfume.</li>
+          <li>Busca el tamaño que se agotó y desmarca la casilla <strong>"Disponible"</strong> junto a ese tamaño.</li>
+          <li>Toca <strong>"Guardar cambios"</strong>.</li>
+        </ol>
+        <p>El cliente va a poder seguir viendo ese tamaño en la ficha del producto, pero no va a poder agregarlo al carrito hasta que lo vuelvas a marcar como disponible.</p>
+      </div>
+    </details>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">¿Cómo oculto un producto completo de la tienda?</summary>
+      <div class="ayuda-item__respuesta">
+        <ol>
+          <li>Entra a <strong>"Productos"</strong> y abre la tarjeta del perfume.</li>
+          <li>Desmarca la casilla <strong>"Activo"</strong>.</li>
+          <li>Toca <strong>"Guardar cambios"</strong>.</li>
+        </ol>
+        <p>El producto deja de aparecer en la tienda, pero no se borra — sigue en tu panel y lo puedes reactivar cuando quieras marcando la casilla de nuevo.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============ PEDIDOS ============ -->
+  <div class="ayuda-grupo">
+    <h2 class="ayuda-grupo__titulo">Pedidos</h2>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">¿Cómo veo y actualizo el estado de un pedido?</summary>
+      <div class="ayuda-item__respuesta">
+        <ol>
+          <li>Entra a <strong>"Pedidos"</strong> en el menú.</li>
+          <li>Puedes filtrar por estado tocando <strong>Pendiente</strong>, <strong>Preparando</strong>, <strong>Enviado</strong> o <strong>Entregado</strong> arriba de la lista.</li>
+          <li>Abre el pedido para ver los productos, la dirección y los datos del cliente.</li>
+          <li>Cambia el estado conforme avanzas: cuando empiezas a preparar el pedido, cámbialo a "Preparando"; cuando lo envías, a "Enviado"; y así.</li>
+        </ol>
+        <p>Al cambiar el estado, el sistema le envía un correo automático al cliente avisándole — no necesitas escribirle tú.</p>
+      </div>
+    </details>
+  </div>
+
+  <!-- ============ PROBLEMAS COMUNES ============ -->
+  <div class="ayuda-grupo">
+    <h2 class="ayuda-grupo__titulo">Problemas comunes</h2>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">Un pedido lleva mucho tiempo en "Pendiente", ¿qué hago?</summary>
+      <div class="ayuda-item__respuesta">
+        <p>Un pedido en <strong>"Pendiente"</strong> significa que el cliente todavía no ha completado su pago, o el sistema todavía no recibió la confirmación de Stripe (la plataforma que procesa los pagos).</p>
+        <ol>
+          <li>Si pasaron solo unos minutos, espera — la confirmación no siempre es instantánea, sobre todo con pagos en tarjeta que piden verificación adicional al banco.</li>
+          <li>Si pasaron varias horas y el cliente te escribió diciendo que ya pagó, revisa si el pedido fue por <strong>tarjeta</strong> u <strong>OXXO</strong> (lo ves en el detalle del pedido) — si fue OXXO, ve la siguiente pregunta.</li>
+          <li>Si pasó más de un día y el pedido sigue en "Pendiente" sin que el cliente haya pagado, probablemente el cliente simplemente no terminó su compra — es normal, no necesitas hacer nada, puedes ignorarlo.</li>
+        </ol>
+        <div class="ayuda-alerta">
+          <strong>No cambies manualmente un pedido de "Pendiente" a otro estado</strong> a menos que estés seguro de que el pago sí se completó. El sistema lo hace automáticamente en cuanto Stripe confirma.
+        </div>
+      </div>
+    </details>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">Un cliente pagó en OXXO pero el pedido no se confirma</summary>
+      <div class="ayuda-item__respuesta">
+        <p>Los pagos en OXXO son distintos a los de tarjeta: cuando el cliente elige pagar en OXXO, recibe un código de barras y tiene que ir físicamente a una tienda a pagarlo en efectivo. <strong>El pedido se queda en "Pendiente" hasta que esto pasa</strong> — eso es normal, no es un error.</p>
+        <ol>
+          <li>Pregúntale al cliente si ya fue a pagar el código en la tienda OXXO.</li>
+          <li>Si ya pagó, la confirmación puede tardar algunas horas en reflejarse (a veces hasta el siguiente día hábil) — depende de OXXO, no de tu tienda.</li>
+          <li>Si pasaron más de 2 días hábiles desde que el cliente dice haber pagado y el pedido sigue "Pendiente", contacta a tu desarrollador para revisarlo directamente en Stripe.</li>
+        </ol>
+      </div>
+    </details>
+
+    <details class="ayuda-item">
+      <summary class="ayuda-item__pregunta">Se cerró mi sesión sola mientras editaba algo</summary>
+      <div class="ayuda-item__respuesta">
+        <p>Por seguridad, tu sesión en el panel se cierra sola después de un tiempo sin actividad. Esto es intencional — protege tu tienda si alguien más usa tu celular o computadora.</p>
+        <ol>
+          <li>Vuelve a iniciar sesión con tu correo y contraseña.</li>
+          <li>Si estabas editando un producto, revisa si el cambio se alcanzó a guardar — si no estás seguro, vuelve a hacer el cambio y toca <strong>"Guardar cambios"</strong> de nuevo, no hace daño repetirlo.</li>
+        </ol>
+        <div class="ayuda-alerta">
+          <strong>Consejo:</strong> si vas a editar varios productos seguidos, guarda los cambios de cada uno antes de pasar al siguiente, en vez de dejar varias tarjetas abiertas sin guardar a la vez.
+        </div>
+      </div>
+    </details>
+  </div>
+
+  <div class="ayuda-contacto">
+    <p>¿Algo no está en esta lista o necesitas ayuda con un caso específico?</p>
+    <!-- TODO(Carlos): reemplazar 521234567890 por tu número real
+         de WhatsApp en formato internacional, sin espacios ni signos
+         (ej. 52 + lada + número a 10 dígitos). -->
+    <a href="https://wa.me/521234567890" class="btn btn-primary" id="ayuda-whatsapp-link">Escríbeme por WhatsApp</a>
+  </div>
+</div>
+
+<script type="module" src="../js/admin/ayuda.js"></script>
+</body>
+</html>

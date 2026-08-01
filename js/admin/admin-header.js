@@ -36,6 +36,7 @@ export function renderAdminHeader(seccionActiva) {
         ${link('categorias-marcas.html', 'Categorías y marcas', 'categorias-marcas')}
         ${link('testimonios.html', 'Testimonios', 'testimonios')}
         ${link('configuracion.html', 'Configuración', 'configuracion')}
+        ${link('ayuda.html', 'Ayuda', 'ayuda')}        
       </nav>
       <button class="btn btn-secondary admin-header__logout" id="btn-cerrar-sesion">Cerrar sesión</button>
     </div>
