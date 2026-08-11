@@ -13,6 +13,16 @@
 export function renderNavbar({ instagramUrl = '#', tiktokUrl = '#' } = {}) {
   return `
     <a href="index.html" class="navbar__logo">AEGON<span>PERFUMES</span></a>
+    <div class="navbar__desktop-nav" aria-label="Navegación principal">
+      <a href="index.html#inicio" class="navbar__desktop-link">Inicio</a>
+      <a href="catalogo.html" class="navbar__desktop-link">Catálogo</a>
+      <a href="marcas.html" class="navbar__desktop-link">Marcas</a>
+      <a href="catalogo.html?genero=hombre" class="navbar__desktop-link">Caballero</a>
+      <a href="catalogo.html?genero=mujer" class="navbar__desktop-link">Dama</a>
+      <a href="index.html#categorias" class="navbar__desktop-link">Categorías</a>
+      <a href="index.html#footer-container" class="navbar__desktop-link">Contáctanos</a>
+      <a href="index.html#testimonios" class="navbar__desktop-link">Testimonios</a>
+    </div>
     <div class="navbar__actions">
       <button class="navbar__icon-btn navbar__menu-btn" id="navbar-menu-button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navbar-mobile-menu">
         <svg class="navbar__icon-svg" viewBox="0 0 24 24" width="22" height="22">
