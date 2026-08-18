@@ -3,6 +3,7 @@ import { renderProductCard, activarSelectorDeVariante } from '../components/prod
 import { renderLoader } from '../components/loader.js';
 import { renderLayout } from '../components/layout.js';
 import { renderFilterPanel, activarPanelFiltros } from '../components/filter-panel.js';
+import { searchProducts } from '../modules/catalogSearch.js';
 
 const PRODUCTOS_POR_PAGINA = 12;
 
@@ -126,96 +127,6 @@ function sincronizarFiltrosEnURL() {
   window.history.replaceState({}, '', nuevaURL);
 }
 
-// Traduce el rango elegido ("500-1000", "2000-") a valores
-// mínimo/máximo utilizables en la consulta.
-function parsearRangoPrecio(valor) {
-  if (!valor) return null;
-  const [min, max] = valor.split('-');
-  return { min: Number(min), max: max ? Number(max) : null };
-}
-
-// ============================================================
-// CONSTRUCCIÓN DE LA CONSULTA A SUPABASE
-// ============================================================
-// category, brand y variants se piden con !inner porque
-// filtramos sobre esos campos embebidos — PostgREST lo exige
-// para poder aplicar .eq()/.in() sobre una tabla relacionada.
-//
-// Con variants!inner, además de mostrarlas, Supabase filtra:
-// devuelve el producto solo si tiene AL MENOS una variante que
-// cumple el filtro, y el array `variants` que llega al frontend
-// viene YA recortado a esas coincidencias — por eso no hace
-// falta tocar product-card.js para nada.
-// ============================================================
-function construirConsulta() {
-  let query = supabaseClient
-    .from('products')
-    .select(`
-      id, name, image_url, is_active,
-      brand:brands!inner(name, slug),
-      category:categories!inner(name, slug),
-      variants!inner(id, size_label, price, discount_percentage, available, type)
-    `)
-    .order('created_at', { ascending: false });
-
-  if (filtros.categoria) {
-    query = query.eq('category.slug', filtros.categoria);
-  }
-  if (filtros.marcas.length > 0) {
-    query = query.in('brand.slug', filtros.marcas);
-  }
-  if (filtros.genero) {
-    query = query.eq('gender', filtros.genero);
-  }
-  if (filtros.tipo) {
-    query = query.eq('variants.type', filtros.tipo);
-  }
-  const rango = parsearRangoPrecio(filtros.precio);
-  if (rango) {
-    query = query.gte('variants.price', rango.min);
-    if (rango.max !== null) query = query.lte('variants.price', rango.max);
-  }
-
-  const desde = paginaActual * PRODUCTOS_POR_PAGINA;
-  const hasta = desde + PRODUCTOS_POR_PAGINA - 1;
-  return query.range(desde, hasta);
-}
-
-// ============================================================
-// BÚSQUEDA DE TEXTO LIBRE
-// ============================================================
-// Combinar en un solo .or() una columna propia (products.name)
-// con una columna de una tabla relacionada (brands.name) tiene
-// soporte limitado en PostgREST, sobre todo junto a los !inner
-// que ya usamos para categoría/marca/variantes — puede fallar
-// en silencio. En vez de eso: resolvemos primero qué marcas
-// coinciden con el texto (consulta simple y confiable), y el
-// filtro final del catálogo solo usa columnas de la propia tabla
-// products (name, brand_id) — sin cruces frágiles.
-// ============================================================
-async function aplicarBusqueda(query) {
-  if (!filtros.busqueda) return query;
-
-  const termino = `%${filtros.busqueda}%`;
-
-  const { data: marcasCoincidentes, error } = await supabaseClient
-    .from('brands')
-    .select('id')
-    .ilike('name', termino);
-
-  if (error) {
-    console.error('Error buscando marcas coincidentes:', error);
-    return query.ilike('name', termino);
-  }
-
-  const idsMarcas = (marcasCoincidentes ?? []).map(m => m.id);
-
-  if (idsMarcas.length > 0) {
-    return query.or(`name.ilike.${termino},brand_id.in.(${idsMarcas.join(',')})`);
-  }
-  return query.ilike('name', termino);
-}
-
 // ============================================================
 // CARGA Y RENDERIZADO
 // ============================================================
@@ -233,44 +144,49 @@ async function cargarProductos({ reset = false } = {}) {
     mensajeVacio.hidden = true;
   }
 
-  let query = construirConsulta();
-  query = await aplicarBusqueda(query);
+  try {
+    const [precioMin, precioMax] = filtros.precio
+      ? filtros.precio.split('-').map(valor => valor ? Number(valor) : null)
+      : [null, null];
+    const filtrosBusqueda = {
+      ...filtros,
+      precioMin,
+      precioMax,
+    };
+    const products = await searchProducts(supabaseClient, filtrosBusqueda, {
+      incluirStock: false,
+      pagina: paginaActual,
+      porPagina: PRODUCTOS_POR_PAGINA,
+    });
 
-  const { data: products, error } = await query;
+    if (reset) grid.innerHTML = '';
 
-  // Sin importar la causa del error, el skeleton SIEMPRE se quita
-  // aquí y se le avisa al usuario — nunca se queda pegado en
-  // "cargando" para siempre.
-  if (error) {
+    if (reset && products.length === 0) {
+      mensajeVacio.textContent = MENSAJE_SIN_RESULTADOS;
+      mensajeVacio.hidden = false;
+      btnCargarMas.hidden = true;
+      return;
+    }
+
+    grid.insertAdjacentHTML('beforeend', products.map(renderProductCard).join(''));
+
+    // Solo activamos el selector de variante en las tarjetas nuevas
+    // (data-activado evita re-adjuntar listeners a las que ya
+    // llegaron en una página anterior de "Cargar más").
+    grid.querySelectorAll('.product-card:not([data-activado])').forEach(card => {
+      activarSelectorDeVariante(card);
+      card.setAttribute('data-activado', 'true');
+    });
+
+    btnCargarMas.hidden = products.length < PRODUCTOS_POR_PAGINA;
+    paginaActual++;
+  } catch (error) {
     console.error('Error cargando el catálogo desde Supabase:', error);
     grid.innerHTML = '';
     mensajeVacio.textContent = MENSAJE_ERROR;
     mensajeVacio.hidden = false;
     btnCargarMas.hidden = true;
-    return;
   }
-
-  if (reset) grid.innerHTML = '';
-
-  if (reset && products.length === 0) {
-    mensajeVacio.textContent = MENSAJE_SIN_RESULTADOS;
-    mensajeVacio.hidden = false;
-    btnCargarMas.hidden = true;
-    return;
-  }
-
-  grid.insertAdjacentHTML('beforeend', products.map(renderProductCard).join(''));
-
-  // Solo activamos el selector de variante en las tarjetas nuevas
-  // (data-activado evita re-adjuntar listeners a las que ya
-  // llegaron en una página anterior de "Cargar más").
-  grid.querySelectorAll('.product-card:not([data-activado])').forEach(card => {
-    activarSelectorDeVariante(card);
-    card.setAttribute('data-activado', 'true');
-  });
-
-  btnCargarMas.hidden = products.length < PRODUCTOS_POR_PAGINA;
-  paginaActual++;
 }
 
 // ============================================================
