@@ -2,7 +2,6 @@ import { supabaseClient } from '../supabase-client.js';
 import { renderLayout } from '../components/layout.js';
 import { obtenerCarrito, calcularTotal, vaciarCarrito, eliminarDelCarrito } from '../cart.js';
 import { formatearPrecio } from '../utils/format.js';
-import { obtenerDatosTransferencia } from '../settings.js';
 import { WHATSAPP_NUMBER } from '../config.js';
 
 // ============================================================
@@ -12,9 +11,27 @@ import { WHATSAPP_NUMBER } from '../config.js';
 // mensaje para que el cliente confirme el pedido por WhatsApp.
 // ============================================================
 
-function renderResumenPedido(carrito) {
+const COSTO_ENVIO = 160;
+const LIMITE_ENVIO_GRATIS = 1000;
+const TEXTO_BOTON_WHATSAPP = 'Enviar pedido por WhatsApp';
+
+/**
+ * Calcula el cargo de envío según subtotal y tipo de entrega.
+ * @param {number} subtotal - importe de los productos
+ * @param {string} deliveryType - tipo de entrega seleccionado
+ * @returns {number} cargo de envío aplicable
+ */
+function calcularCostoEnvio(subtotal, deliveryType) {
+  const esEnvio = deliveryType !== 'local';
+  return esEnvio && subtotal <= LIMITE_ENVIO_GRATIS ? COSTO_ENVIO : 0;
+}
+
+function renderResumenPedido(carrito, deliveryType = 'local') {
   const contenedorItems = document.getElementById('checkout-items');
   const filaTotal = document.getElementById('checkout-total-row');
+  const subtotal = calcularTotal(carrito);
+  const envio = calcularCostoEnvio(subtotal, deliveryType);
+  const total = subtotal + envio;
 
   contenedorItems.innerHTML = carrito.map(item => `
     <div class="cart-item">
@@ -27,7 +44,11 @@ function renderResumenPedido(carrito) {
     </div>
   `).join('');
 
-  filaTotal.innerHTML = `<span>Total</span><span>${formatearPrecio(calcularTotal(carrito))}</span>`;
+  filaTotal.innerHTML = `
+    <span>Subtotal</span><span>${formatearPrecio(subtotal)}</span>
+    <span>Envío</span><span>${envio ? formatearPrecio(envio) : 'Gratis'}</span>
+    <strong>Total</strong><strong>${formatearPrecio(total)}</strong>
+  `;
 }
 
 // Muestra/oculta el campo de dirección según el tipo de entrega
@@ -122,31 +143,15 @@ function renderDatosTransferencia(datos) {
   document.getElementById('transfer-note').textContent = datos.note || 'Usa tu numero de pedido como concepto y envia comprobante por WhatsApp.';
 }
 
-function activarMetodoPago() {
-  const selectMetodo = document.getElementById('input-metodo-pago');
-  const bloqueTransferencia = document.getElementById('transferencia-info');
-  const btnConfirmar = document.getElementById('btn-confirmar-pedido');
-
-  function actualizar() {
-    const esTransferencia = selectMetodo.value === 'transferencia';
-    bloqueTransferencia.hidden = !esTransferencia;
-    // El selector se conserva por compatibilidad con el formulario existente,
-    // pero ningún método crea pedidos ni inicia pagos desde el checkout.
-    btnConfirmar.textContent = 'Enviar pedido por WhatsApp';
-  }
-
-  selectMetodo.addEventListener('change', actualizar);
-  actualizar();
-}
-
 /**
  * Construye el texto de WhatsApp a partir del carrito y los datos del cliente.
  * @param {Array} cartItems - productos con nombre, variante, cantidad y precio
  * @param {Object} customerInfo - nombre, tipo de entrega y dirección opcional
- * @param {number} total - total visible del carrito
+ * @param {number} total - total final, incluyendo envío
+ * @param {number} shippingFee - cargo de envío aplicado
  * @returns {string} mensaje listo para compartir
  */
-function buildWhatsAppMessage(cartItems, customerInfo, total) {
+function buildWhatsAppMessage(cartItems, customerInfo, total, shippingFee) {
   const items = cartItems.map(item =>
     `- ${item.name} — ${item.sizeLabel} x${item.quantity} · ${formatearPrecio(item.price * item.quantity)}`
   ).join('\n');
@@ -162,6 +167,7 @@ function buildWhatsAppMessage(cartItems, customerInfo, total) {
     '',
     items,
     '',
+    `Envío: ${shippingFee ? formatearPrecio(shippingFee) : 'Gratis'}`,
     `Total: ${formatearPrecio(total)}`,
   ].join('\n');
 }
@@ -170,11 +176,12 @@ function buildWhatsAppMessage(cartItems, customerInfo, total) {
  * Genera el enlace de WhatsApp con el pedido prellenado.
  * @param {Array} cartItems - productos del carrito
  * @param {Object} customerInfo - datos de contacto y entrega
- * @param {number} total - total del pedido
+ * @param {number} total - total final del pedido
+ * @param {number} shippingFee - cargo de envío aplicado
  * @returns {string} URL completa de WhatsApp
  */
-function buildWhatsAppLink(cartItems, customerInfo, total) {
-  const message = buildWhatsAppMessage(cartItems, customerInfo, total);
+function buildWhatsAppLink(cartItems, customerInfo, total, shippingFee) {
+  const message = buildWhatsAppMessage(cartItems, customerInfo, total, shippingFee);
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
@@ -203,13 +210,16 @@ async function iniciarCheckout() {
   }
 
   actualizarVistaCheckoutSegunCarrito(carrito);
-  renderResumenPedido(carrito);
   activarCampoDireccion();
-  renderDatosTransferencia(await obtenerDatosTransferencia());
-  activarMetodoPago();
+  renderResumenPedido(carrito, document.getElementById('input-entrega').value);
 
   const form = document.getElementById('checkout-form');
   const btnConfirmar = document.getElementById('btn-confirmar-pedido');
+  const selectEntrega = document.getElementById('input-entrega');
+
+  selectEntrega.addEventListener('change', () => {
+    renderResumenPedido(obtenerCarrito(), selectEntrega.value);
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -221,7 +231,6 @@ async function iniciarCheckout() {
       customer_email: document.getElementById('input-email').value.trim(),
       delivery_type: document.getElementById('input-entrega').value,
       delivery_address: document.getElementById('input-direccion').value.trim(),
-      payment_method: document.getElementById('input-metodo-pago').value,
     };
 
     if (!datosCliente.customer_name || !datosCliente.customer_phone) {
@@ -244,7 +253,7 @@ async function iniciarCheckout() {
         actualizarVistaCheckoutSegunCarrito(carritoActual);
         mostrarError(construirMensajeItemsInactivos(removidos));
         btnConfirmar.disabled = false;
-        btnConfirmar.textContent = 'Confirmar pedido';
+        btnConfirmar.textContent = TEXTO_BOTON_WHATSAPP;
         return;
       }
 
@@ -252,22 +261,24 @@ async function iniciarCheckout() {
         actualizarVistaCheckoutSegunCarrito(carritoActual);
         mostrarError('Tu carrito quedó vacío porque los productos ya no están disponibles.');
         btnConfirmar.disabled = false;
-        btnConfirmar.textContent = 'Confirmar pedido';
+        btnConfirmar.textContent = TEXTO_BOTON_WHATSAPP;
         return;
       }
 
+      const subtotal = calcularTotal(carritoActual);
+      const shippingFee = calcularCostoEnvio(subtotal, datosCliente.delivery_type);
       const enlaceWhatsApp = buildWhatsAppLink(carritoActual, {
         name: datosCliente.customer_name,
         deliveryType: datosCliente.delivery_type,
         deliveryAddress: datosCliente.delivery_address,
-      }, calcularTotal(carritoActual));
+      }, subtotal + shippingFee, shippingFee);
       vaciarCarrito();
       window.location.href = enlaceWhatsApp;
     } catch (error) {
       console.error('Error preparando el pedido para WhatsApp:', error);
       mostrarError('No pudimos preparar tu pedido. Intenta de nuevo en unos segundos.');
       btnConfirmar.disabled = false;
-      btnConfirmar.textContent = 'Confirmar pedido';
+      btnConfirmar.textContent = TEXTO_BOTON_WHATSAPP;
     }
   });
 }
