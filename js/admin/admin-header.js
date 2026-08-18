@@ -32,6 +32,7 @@ export function renderAdminHeader(seccionActiva) {
         ${link('dashboard.html', 'Dashboard', 'dashboard')}
         ${link('index.html', 'Productos', 'productos')}
         ${link('nuevo-producto.html', 'Nuevo producto', 'nuevo-producto')}
+        ${link('nuevo-pedido.html', 'Nuevo pedido', 'nuevo-pedido')}
         ${link('pedidos.html', 'Pedidos', 'pedidos')}
         ${link('categorias-marcas.html', 'Categorías y marcas', 'categorias-marcas')}
         ${link('testimonios.html', 'Testimonios', 'testimonios')}

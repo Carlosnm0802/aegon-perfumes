@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nuevo pedido — Admin AegonPerfumes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/design-system.css">
+</head>
+<body>
+
+<header class="admin-header" id="admin-header-container"></header>
+
+<main class="container admin-content">
+  <h1 class="section__title">Nuevo pedido</h1>
+
+  <section class="admin-order-layout">
+    <div>
+      <section class="admin-order-panel">
+        <div class="admin-order-panel__header">
+          <h2 class="admin-form__subtitle">Buscar productos</h2>
+          <span id="nuevo-pedido-resultados" class="admin-order-panel__meta"></span>
+        </div>
+        <div class="admin-order-search">
+          <label class="sr-only" for="nuevo-pedido-busqueda">Buscar producto o marca</label>
+          <input type="search" id="nuevo-pedido-busqueda" placeholder="Buscar producto o marca...">
+        </div>
+        <div class="admin-order-filters">
+          <select id="nuevo-pedido-categoria" aria-label="Filtrar por categoría">
+            <option value="">Todas las categorías</option>
+          </select>
+          <select id="nuevo-pedido-marca" aria-label="Filtrar por marca">
+            <option value="">Todas las marcas</option>
+          </select>
+          <select id="nuevo-pedido-tipo" aria-label="Filtrar por tipo">
+            <option value="">Todos los tipos</option>
+            <option value="decant">Decant</option>
+            <option value="completo">Completo</option>
+          </select>
+          <select id="nuevo-pedido-precio" aria-label="Filtrar por precio">
+            <option value="">Todos los precios</option>
+            <option value="0-500">Menos de $500</option>
+            <option value="500-1000">$500–$1,000</option>
+            <option value="1000-2000">$1,000–$2,000</option>
+            <option value="2000-">Más de $2,000</option>
+          </select>
+        </div>
+        <div id="nuevo-pedido-resultados-lista" class="admin-order-results">
+          <p>Escribe para buscar productos.</p>
+        </div>
+      </section>
+    </div>
+
+    <section class="admin-order-panel admin-order-builder">
+      <h2 class="admin-form__subtitle">Pedido en construcción</h2>
+      <div id="nuevo-pedido-items" class="admin-order-items">
+        <p class="admin-order-empty">Aún no hay productos en el pedido.</p>
+      </div>
+      <div class="admin-order-total">
+        <span>Total</span>
+        <strong id="nuevo-pedido-total">$0 MXN</strong>
+      </div>
+
+      <form id="nuevo-pedido-form" class="admin-form">
+        <div class="form-field">
+          <label for="nuevo-pedido-nombre">Nombre del cliente</label>
+          <input type="text" id="nuevo-pedido-nombre" required>
+        </div>
+        <div class="form-field">
+          <label for="nuevo-pedido-telefono">Teléfono</label>
+          <input type="tel" id="nuevo-pedido-telefono" required>
+        </div>
+        <div class="form-field">
+          <label for="nuevo-pedido-entrega">Tipo de entrega</label>
+          <select id="nuevo-pedido-entrega" required>
+            <option value="local">Recoger en persona</option>
+            <option value="envio_local">Envío local</option>
+            <option value="paqueteria">Paquetería nacional</option>
+          </select>
+        </div>
+        <div id="nuevo-pedido-error" class="checkout-error" hidden></div>
+        <div id="nuevo-pedido-exito" class="admin-form__status" hidden></div>
+        <button type="submit" class="btn btn-primary" id="nuevo-pedido-confirmar" style="width:100%;">
+          Confirmar pedido
+        </button>
+      </form>
+    </section>
+  </section>
+</main>
+
+<script type="module" src="../js/admin/nuevo-pedido.js"></script>
+</body>
+</html>

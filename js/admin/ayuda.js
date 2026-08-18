@@ -1,6 +1,6 @@
 import { requireAuth, cerrarSesion } from './auth-guard.js';
 import { renderAdminHeader, activarAdminHeader } from './admin-header.js';
-import { obtenerWhatsappNumber } from '../settings.js';
+import { WHATSAPP_NUMBER } from '../config.js';
 
 // ============================================================
 // PÁGINA DE AYUDA (ADMIN)
@@ -21,8 +21,7 @@ async function iniciar() {
 
   const whatsappLink = document.getElementById('ayuda-whatsapp-link');
   if (whatsappLink) {
-    const numeroWhatsapp = await obtenerWhatsappNumber();
-    whatsappLink.href = `https://wa.me/${numeroWhatsapp}`;
+    whatsappLink.href = `https://wa.me/${WHATSAPP_NUMBER}`;
     whatsappLink.target = '_blank';
     whatsappLink.rel = 'noopener';
   }

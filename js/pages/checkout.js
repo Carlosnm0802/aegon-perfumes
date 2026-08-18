@@ -3,17 +3,13 @@ import { renderLayout } from '../components/layout.js';
 import { obtenerCarrito, calcularTotal, vaciarCarrito, eliminarDelCarrito } from '../cart.js';
 import { formatearPrecio } from '../utils/format.js';
 import { obtenerDatosTransferencia } from '../settings.js';
+import { WHATSAPP_NUMBER } from '../config.js';
 
 // ============================================================
 // PÁGINA: CHECKOUT
 // ============================================================
-// Lee el carrito de localStorage, muestra el resumen, valida y
-// guarda el pedido en Supabase (orders + order_items).
-//
-// [ALERTA] Esta versión NO conectaba el pago en línea al inicio
-// del bloque. Hoy ya crea la sesión en Stripe Checkout; si falla,
-// el pedido queda en 'pendiente' para que el cliente pueda retomar
-// el pago después (retomar-pago.html).
+// Lee el carrito de localStorage, muestra el resumen y prepara un
+// mensaje para que el cliente confirme el pedido por WhatsApp.
 // ============================================================
 
 function renderResumenPedido(carrito) {
@@ -134,78 +130,52 @@ function activarMetodoPago() {
   function actualizar() {
     const esTransferencia = selectMetodo.value === 'transferencia';
     bloqueTransferencia.hidden = !esTransferencia;
-    btnConfirmar.textContent = esTransferencia ? 'Confirmar pedido' : 'Pagar con tarjeta';
+    // El selector se conserva por compatibilidad con el formulario existente,
+    // pero ningún método crea pedidos ni inicia pagos desde el checkout.
+    btnConfirmar.textContent = 'Enviar pedido por WhatsApp';
   }
 
   selectMetodo.addEventListener('change', actualizar);
   actualizar();
 }
 
-// ============================================================
-// GUARDAR EL PEDIDO EN SUPABASE
-// ============================================================
-// unit_price se toma del carrito (no de una nueva consulta) para
-// conservar el precio exacto que el cliente vio al momento de
-// comprar, tal como quedó decidido en Fase 4. Ver más abajo por
-// qué el id se genera en el navegador en vez de pedírselo a
-// Supabase de vuelta.
-// ============================================================
-async function guardarPedido(datosCliente, carrito) {
-  // Generamos el id nosotros mismos: así no necesitamos pedirle a
-  // Supabase que nos devuelva la fila recién creada (.select()),
-  // algo que las políticas de RLS bloquean a propósito — nadie
-  // debería poder leer pedidos, ni siquiera el que acaba de crear.
-  const orderId = crypto.randomUUID();
+/**
+ * Construye el texto de WhatsApp a partir del carrito y los datos del cliente.
+ * @param {Array} cartItems - productos con nombre, variante, cantidad y precio
+ * @param {Object} customerInfo - nombre, tipo de entrega y dirección opcional
+ * @param {number} total - total visible del carrito
+ * @returns {string} mensaje listo para compartir
+ */
+function buildWhatsAppMessage(cartItems, customerInfo, total) {
+  const items = cartItems.map(item =>
+    `- ${item.name} — ${item.sizeLabel} x${item.quantity} · ${formatearPrecio(item.price * item.quantity)}`
+  ).join('\n');
+  const direccion = customerInfo.deliveryAddress
+    ? `\nDirección: ${customerInfo.deliveryAddress}`
+    : '';
 
-  const { error: errorPedido } = await supabaseClient
-    .from('orders')
-    .insert({
-      id: orderId,
-      customer_name: datosCliente.customer_name,
-      customer_phone: datosCliente.customer_phone,
-      customer_email: datosCliente.customer_email || null,
-      delivery_type: datosCliente.delivery_type,
-      delivery_address: datosCliente.delivery_address || null,
-      total: calcularTotal(carrito),
-    });
-
-  if (errorPedido) {
-    throw errorPedido;
-  }
-
-  const itemsAInsertar = carrito.map(item => ({
-    order_id: orderId,
-    variant_id: item.variantId,
-    quantity: item.quantity,
-    unit_price: item.price,
-  }));
-
-  const { error: errorItems } = await supabaseClient
-    .from('order_items')
-    .insert(itemsAInsertar);
-
-  if (errorItems) {
-    throw errorItems;
-  }
-
-  return { id: orderId };
+  return [
+    'Hola, quiero confirmar este pedido:',
+    '',
+    `Nombre: ${customerInfo.name}`,
+    `Entrega: ${customerInfo.deliveryType}${direccion}`,
+    '',
+    items,
+    '',
+    `Total: ${formatearPrecio(total)}`,
+  ].join('\n');
 }
 
-async function notificarCreacionPedido(orderId) {
-  try {
-    const { error } = await supabaseClient.functions.invoke('notificar-pedido', {
-      body: {
-        orderId,
-        eventType: 'created',
-      },
-    });
-
-    if (error) {
-      console.warn('No se pudo enviar correo de pedido creado:', error);
-    }
-  } catch (error) {
-    console.warn('Fallo inesperado enviando correo de pedido creado:', error);
-  }
+/**
+ * Genera el enlace de WhatsApp con el pedido prellenado.
+ * @param {Array} cartItems - productos del carrito
+ * @param {Object} customerInfo - datos de contacto y entrega
+ * @param {number} total - total del pedido
+ * @returns {string} URL completa de WhatsApp
+ */
+function buildWhatsAppLink(cartItems, customerInfo, total) {
+  const message = buildWhatsAppMessage(cartItems, customerInfo, total);
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
 // ============================================================
@@ -264,7 +234,7 @@ async function iniciarCheckout() {
     }
 
     btnConfirmar.disabled = true;
-    btnConfirmar.textContent = 'Guardando pedido...';
+    btnConfirmar.textContent = 'Preparando WhatsApp...';
 
     try {
       const { carritoValido: carritoActual, removidos } = await validarYDepurarCarrito(obtenerCarrito());
@@ -286,46 +256,16 @@ async function iniciarCheckout() {
         return;
       }
 
-      const pedido = await guardarPedido(datosCliente, carritoActual);
-      await notificarCreacionPedido(pedido.id);
-
-      if (datosCliente.payment_method === 'transferencia') {
-        vaciarCarrito();
-        const destino = `confirmacion.html?metodo=transferencia&order_id=${encodeURIComponent(pedido.id)}`;
-        window.location.href = destino;
-        return;
-      }
-
-      btnConfirmar.textContent = 'Conectando con el pago...';
-
-      // La Edge Function crea la sesión de pago usando el Secret
-      // Key real de Stripe (que nunca sale de Supabase) y nos
-      // devuelve la URL de checkout.
-      const { data: sesion, error: errorSesion } = await supabaseClient.functions.invoke(
-        'crear-sesion-pago',
-        {
-          body: {
-            orderId: pedido.id,
-            items: carritoActual,
-            customerEmail: datosCliente.customer_email,
-          },
-        }
-      );
-
-      if (errorSesion || !sesion?.checkout_url) {
-        throw errorSesion || new Error('No se recibió una URL de pago válida.');
-      }
-
+      const enlaceWhatsApp = buildWhatsAppLink(carritoActual, {
+        name: datosCliente.customer_name,
+        deliveryType: datosCliente.delivery_type,
+        deliveryAddress: datosCliente.delivery_address,
+      }, calcularTotal(carritoActual));
       vaciarCarrito();
-
-      // Stripe usa la MISMA URL de checkout para modo prueba y
-      // modo prueba y producción — el cambio entre uno y otro se
-      // hace solo con qué Secret Key configuraste en Supabase
-      // (sk_test_... vs sk_live_...), sin tocar esta línea.
-      window.location.href = sesion.checkout_url;
+      window.location.href = enlaceWhatsApp;
     } catch (error) {
-      console.error('Error guardando el pedido o creando el pago:', error);
-      mostrarError('No pudimos procesar tu pedido. Intenta de nuevo en unos segundos.');
+      console.error('Error preparando el pedido para WhatsApp:', error);
+      mostrarError('No pudimos preparar tu pedido. Intenta de nuevo en unos segundos.');
       btnConfirmar.disabled = false;
       btnConfirmar.textContent = 'Confirmar pedido';
     }
