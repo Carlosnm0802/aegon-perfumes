@@ -32,6 +32,11 @@ function guardarCarrito(carrito) {
 // Si no, la agrega como línea nueva.
 export function agregarAlCarrito(item) {
   const carrito = obtenerCarrito();
+
+  if (!item || item.available === false || item.productActive === false) {
+    return carrito;
+  }
+
   const existente = carrito.find(i => i.variantId === item.variantId);
 
   if (existente) {

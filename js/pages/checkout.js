@@ -26,12 +26,46 @@ function calcularCostoEnvio(subtotal, deliveryType) {
   return esEnvio && subtotal <= LIMITE_ENVIO_GRATIS ? COSTO_ENVIO : 0;
 }
 
+function renderAvisoEnvio(carrito, deliveryType) {
+  const contenedor = document.getElementById('shipping-progress-container');
+  if (!contenedor) return;
+
+  const subtotal = calcularTotal(carrito);
+  const esRecogida = deliveryType === 'local';
+  const montoFaltante = Math.max(0, LIMITE_ENVIO_GRATIS - subtotal);
+
+  if (esRecogida) {
+    contenedor.innerHTML = `
+      <aside class="shipping-progress shipping-progress--pickup" aria-live="polite">
+        <strong>Recogida en persona</strong>
+        <span>Sin costo de envío</span>
+      </aside>
+    `;
+    return;
+  }
+
+  const envioGratis = montoFaltante === 0;
+  contenedor.innerHTML = `
+    <aside class="shipping-progress ${envioGratis ? 'shipping-progress--unlocked' : ''}" aria-live="polite">
+      <div class="shipping-progress__copy">
+        <strong>${envioGratis ? '¡Envío gratis desbloqueado!' : `Te faltan ${formatearPrecio(montoFaltante)} para envío gratis`}</strong>
+        <span>${envioGratis ? 'Aplica para envíos local y nacional.' : `Envío estándar: ${formatearPrecio(COSTO_ENVIO)}`}</span>
+      </div>
+      <div class="shipping-progress__track" role="progressbar" aria-valuemin="0" aria-valuemax="${LIMITE_ENVIO_GRATIS}" aria-valuenow="${Math.min(subtotal, LIMITE_ENVIO_GRATIS)}">
+        <span style="width:${Math.min(100, (subtotal / LIMITE_ENVIO_GRATIS) * 100)}%"></span>
+      </div>
+    </aside>
+  `;
+}
+
 function renderResumenPedido(carrito, deliveryType = 'local') {
   const contenedorItems = document.getElementById('checkout-items');
   const filaTotal = document.getElementById('checkout-total-row');
   const subtotal = calcularTotal(carrito);
   const envio = calcularCostoEnvio(subtotal, deliveryType);
   const total = subtotal + envio;
+
+  renderAvisoEnvio(carrito, deliveryType);
 
   contenedorItems.innerHTML = carrito.map(item => `
     <div class="cart-item">
@@ -45,9 +79,15 @@ function renderResumenPedido(carrito, deliveryType = 'local') {
   `).join('');
 
   filaTotal.innerHTML = `
-    <span>Subtotal</span><span>${formatearPrecio(subtotal)}</span>
-    <span>Envío</span><span>${envio ? formatearPrecio(envio) : 'Gratis'}</span>
-    <strong>Total</strong><strong>${formatearPrecio(total)}</strong>
+    <div class="checkout-total-line">
+      <span>Subtotal</span><span>${formatearPrecio(subtotal)}</span>
+    </div>
+    <div class="checkout-total-line">
+      <span>Envío</span><span>${envio ? formatearPrecio(envio) : 'Gratis'}</span>
+    </div>
+    <div class="checkout-total-line checkout-total-line--grand">
+      <strong>Total</strong><strong>${formatearPrecio(total)}</strong>
+    </div>
   `;
 }
 
@@ -219,6 +259,14 @@ async function iniciarCheckout() {
 
   selectEntrega.addEventListener('change', () => {
     renderResumenPedido(obtenerCarrito(), selectEntrega.value);
+  });
+
+  window.addEventListener('carrito:actualizado', () => {
+    const carritoActual = obtenerCarrito();
+    actualizarVistaCheckoutSegunCarrito(carritoActual);
+    if (carritoActual.length > 0) {
+      renderResumenPedido(carritoActual, selectEntrega.value);
+    }
   });
 
   form.addEventListener('submit', async (e) => {

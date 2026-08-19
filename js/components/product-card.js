@@ -118,7 +118,7 @@ export function activarSelectorDeVariante(card) {
         floatingBadgeEl.textContent = tieneDescuento ? formatearDescuento(descuentoPct) : '';
         floatingBadgeEl.hidden = !tieneDescuento;
       }
-      badgesEl.innerHTML = renderBadge(pill.dataset.type);
+      badgesEl.innerHTML = renderBadge(pill.dataset.type, disponibleParaCompra);
     });
   });
 
@@ -136,6 +136,8 @@ export function activarSelectorDeVariante(card) {
         sizeLabel: pillActivo.textContent.trim(),
         type: pillActivo.dataset.type,
         price: Number(pillActivo.dataset.price),
+        available: pillActivo.disabled === false,
+        productActive: card.classList.contains('product-card--unavailable') === false,
       };
 
       agregarAlCarrito(item);
