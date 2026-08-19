@@ -4,6 +4,14 @@ const NUMERO_POR_DEFECTO = '521234567890';
 const INSTAGRAM_POR_DEFECTO = 'https://www.instagram.com/aegonparfums';
 const TIKTOK_POR_DEFECTO = 'https://www.tiktok.com';
 const INSTAGRAM_IMAGENES_POR_DEFECTO = [
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%2810%29.jpeg',
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%287%29.jpeg',
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%288%29.jpeg',
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%289%29.jpeg',
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%284%29.jpeg',
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%2811%29.jpeg',
+];
+const IMAGENES_INSTAGRAM_ANTERIORES = [
   'https://images.unsplash.com/photo-1505239034653-abfc95288b6c?w=300&h=300&fit=crop&q=70&auto=format',
   'https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.3',
   'https://images.unsplash.com/photo-1543422655-ac1c6ca993ed?w=300&h=300&fit=crop&q=70&auto=format&fp-x=0.7',
@@ -93,7 +101,7 @@ export async function obtenerInstagramGallery() {
   const imageUrls = INSTAGRAM_IMAGENES_POR_DEFECTO.map((fallback, index) => {
     const key = `instagram_image_${index + 1}`;
     const value = (data?.[key] ?? '').trim();
-    return value || fallback;
+    return !value || IMAGENES_INSTAGRAM_ANTERIORES.includes(value) ? fallback : value;
   });
 
   return { instagramUrl, imageUrls };

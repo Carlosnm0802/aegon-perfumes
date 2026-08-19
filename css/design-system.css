@@ -768,25 +768,48 @@ a:hover { color: var(--color-accent-hover); }
 
 .hero {
   position: relative;
-  padding: var(--space-7) var(--space-4);
+  background-color: var(--color-surface);
+  min-height: min(620px, 68vh);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  padding: var(--space-8) var(--space-4);
   text-align: center;
   overflow: hidden;
+}
+
+.hero__image,
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero__image {
+  object-fit: cover;
+  object-position: center 58%;
+  z-index: 0;
+}
+
+.hero__scrim {
+  background-color: rgba(10, 10, 11, 0.68);
+  z-index: 1;
 }
 
 .hero::before {
   content: '';
   position: absolute;
-  top: -20%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(197, 160, 89, 0.12) 0%, transparent 70%);
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  margin: var(--space-4);
   pointer-events: none;
+  z-index: 2;
 }
 
 .hero__eyebrow {
   position: relative;
+  z-index: 3;
   font-size: var(--fs-xs);
   color: var(--color-accent);
   text-transform: uppercase;
@@ -796,6 +819,7 @@ a:hover { color: var(--color-accent-hover); }
 
 .hero__title {
   position: relative;
+  z-index: 3;
   /* clamp: nunca baja de 28px ni sube de 48px, escala según
      el ancho de pantalla — evita que se vea apretado en
      celulares de 320-360px sin perder impacto en desktop */
@@ -805,9 +829,30 @@ a:hover { color: var(--color-accent-hover); }
 
 .hero__subtitle {
   position: relative;
+  z-index: 3;
   max-width: 480px;
   margin: 0 auto var(--space-6) auto;
   font-size: var(--fs-base);
+}
+
+.hero > .btn {
+  position: relative;
+  z-index: 3;
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: min(560px, 72vh);
+    padding: var(--space-7) var(--space-4);
+  }
+
+  .hero__image {
+    object-position: 62% center;
+  }
+
+  .hero::before {
+    margin: var(--space-3);
+  }
 }
 
 /* ============================================================
