@@ -790,6 +790,11 @@ a:hover { color: var(--color-accent-hover); }
   object-fit: cover;
   object-position: center 58%;
   z-index: 0;
+  transition: opacity 350ms ease;
+}
+
+.hero__image--changing {
+  opacity: 0.2;
 }
 
 .hero__scrim {
@@ -852,6 +857,12 @@ a:hover { color: var(--color-accent-hover); }
 
   .hero::before {
     margin: var(--space-3);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__image {
+    transition: none;
   }
 }
 

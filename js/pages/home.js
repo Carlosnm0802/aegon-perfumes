@@ -17,6 +17,55 @@ const TESTIMONIOS_DE_RESPALDO = [
   },
 ];
 
+const IMAGENES_HERO = [
+  'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=1600&h=1200&fit=crop&q=80&auto=format',
+  'https://images.unsplash.com/photo-1557170334-a9086f3f5c9b?w=1600&h=1200&fit=crop&q=80&auto=format',
+  'https://images.unsplash.com/photo-1505239034653-abfc95288b6c?w=1600&h=1200&fit=crop&q=80&auto=format',
+  'https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?w=1600&h=1200&fit=crop&q=80&auto=format',
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%285%29.jpeg',
+  'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%2813%29.jpeg',
+];
+
+function activarHeroDinamico() {
+  const imagen = document.querySelector('[data-hero-image]');
+  if (!imagen || IMAGENES_HERO.length < 2) return;
+
+  const imagenesPrecargadas = IMAGENES_HERO.map((src) => {
+    const imagenPrecargada = new Image();
+    imagenPrecargada.src = src;
+    return imagenPrecargada;
+  });
+  let indiceActual = 0;
+
+  const cambiarImagen = () => {
+    indiceActual = (indiceActual + 1) % imagenesPrecargadas.length;
+    const siguiente = imagenesPrecargadas[indiceActual];
+    imagen.classList.add('hero__image--changing');
+    const mostrarSiguiente = () => {
+      imagen.src = siguiente.src;
+      imagen.alt = 'Coleccion de perfumes AegonPerfumes';
+      imagen.classList.remove('hero__image--changing');
+    };
+    const mostrarRespaldo = () => {
+      imagen.src = IMAGENES_HERO[0];
+      imagen.alt = 'Frascos de perfume sobre una mesa';
+      imagen.classList.remove('hero__image--changing');
+    };
+    if (siguiente.complete && siguiente.naturalWidth > 0) {
+      mostrarSiguiente();
+    } else if (siguiente.complete) {
+      mostrarRespaldo();
+    } else {
+      siguiente.onload = mostrarSiguiente;
+      siguiente.onerror = mostrarRespaldo;
+    }
+  };
+
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    window.setInterval(cambiarImagen, 5000);
+  }
+}
+
 // ============================================================
 // PÁGINA: HOME
 // ============================================================
@@ -233,6 +282,7 @@ async function cargarRecienLlegados() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   await renderLayout();
+  activarHeroDinamico();
   await aplicarInstagramConfigurado();
   await activarFormularioTestimonios();
   cargarRecienLlegados();
