@@ -1,6 +1,7 @@
 import { supabaseClient } from '../supabase-client.js';
 import { renderLayout } from '../components/layout.js';
 import { obtenerWhatsappNumber, obtenerDatosTransferencia } from '../settings.js';
+import { formatearPrecio } from '../utils/format.js';
 
 // ============================================================
 // PÁGINA: CONFIRMACIÓN
@@ -20,6 +21,36 @@ function renderBotonWhatsApp(numeroWhatsapp, mensaje) {
 function renderNumeroPedido(orderId) {
   if (!orderId) return '';
   return `<p><strong>Numero de pedido:</strong> ${escapeHtml(orderId)}</p>`;
+}
+
+function obtenerResumenPedidoGuardado() {
+  try {
+    const resumen = JSON.parse(sessionStorage.getItem('aegon-last-order-summary') || 'null');
+    if (!resumen || !Array.isArray(resumen.items)) return null;
+    return resumen;
+  } catch {
+    return null;
+  }
+}
+
+function construirMensajeTransferencia(orderId, resumen) {
+  const idCorto = orderId.split('-')[0];
+  const lineas = resumen?.items?.map(item =>
+    `- ${item.name} — ${item.sizeLabel} x${item.quantity}: ${formatearPrecio(item.price * item.quantity)}`
+  ) ?? [];
+  const productos = lineas.length > 0 ? lineas.join('\n') : '- Productos incluidos en el pedido';
+  const total = resumen?.total !== undefined ? formatearPrecio(resumen.total) : 'pendiente de confirmar';
+
+  return [
+    `Hola, ya realicé la transferencia de mi pedido #${idCorto}.`,
+    '',
+    'Productos:',
+    productos,
+    '',
+    `Total pagado: ${total}`,
+    '',
+    'Te comparto mi comprobante.',
+  ].join('\n');
 }
 
 function escapeHtml(texto) {
@@ -54,14 +85,20 @@ async function iniciarConfirmacion() {
 
   if (!sessionId && metodo === 'transferencia' && orderId) {
     const transferencia = await obtenerDatosTransferencia();
-    const mensaje = `Hola, ya realice la transferencia de mi pedido ${orderId}. Te comparto mi comprobante.`;
+    const resumen = obtenerResumenPedidoGuardado();
+    const mensaje = construirMensajeTransferencia(orderId, resumen);
+    const resumenHtml = resumen?.items?.length > 0
+      ? `<div class="checkout-transferencia__pedido"><p><strong>Productos:</strong></p>${resumen.items.map(item => `<p>${escapeHtml(item.name)} — ${escapeHtml(item.sizeLabel)} x${item.quantity}: ${escapeHtml(formatearPrecio(item.price * item.quantity))}</p>`).join('')}<p><strong>Total: ${escapeHtml(formatearPrecio(resumen.total))}</strong></p></div>`
+      : '';
     contenedor.innerHTML = `
       <h2>Pedido registrado para transferencia</h2>
       <p>Tu pedido ya esta apartado. Realiza la transferencia y envianos tu comprobante para confirmar el pago.</p>
       ${renderNumeroPedido(orderId)}
+      ${resumenHtml}
       ${renderInstruccionesTransferencia(transferencia)}
       ${renderBotonWhatsApp(numeroWhatsapp, mensaje)}
     `;
+    sessionStorage.removeItem('aegon-last-order-summary');
     return;
   }
 

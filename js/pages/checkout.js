@@ -346,6 +346,15 @@ async function iniciarCheckout() {
       const orderId = await registrarPedido(carritoActual, datosCliente, total);
 
       if (selectMetodoPago.value === 'transferencia') {
+        sessionStorage.setItem('aegon-last-order-summary', JSON.stringify({
+          items: carritoActual.map(item => ({
+            name: item.name,
+            sizeLabel: item.sizeLabel,
+            quantity: item.quantity,
+            price: item.price,
+          })),
+          total,
+        }));
         vaciarCarrito();
         window.location.href = `confirmacion.html?metodo=transferencia&order_id=${encodeURIComponent(orderId)}`;
         return;
