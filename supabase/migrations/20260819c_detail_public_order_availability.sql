@@ -1,4 +1,4 @@
--- Corrige la validación del total para respetar descuentos de variantes.
+-- Diferencia entre una variante desactivada y una variante sin stock.
 create or replace function create_public_order(
   p_customer_name text,
   p_customer_phone text,
@@ -29,8 +29,7 @@ begin
   end if;
 
   for v_item in
-    select
-      (item->>'variant_id')::uuid as variant_id,
+    select (item->>'variant_id')::uuid as variant_id,
       sum((item->>'quantity')::integer)::integer as quantity
     from jsonb_array_elements(p_items) as items(item)
     group by (item->>'variant_id')::uuid
@@ -80,8 +79,7 @@ begin
   returning id into v_order_id;
 
   for v_item in
-    select
-      (item->>'variant_id')::uuid as variant_id,
+    select (item->>'variant_id')::uuid as variant_id,
       sum((item->>'quantity')::integer)::integer as quantity
     from jsonb_array_elements(p_items) as items(item)
     group by (item->>'variant_id')::uuid

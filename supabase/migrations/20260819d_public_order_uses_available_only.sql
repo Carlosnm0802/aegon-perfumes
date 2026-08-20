@@ -1,4 +1,5 @@
--- Corrige la validación del total para respetar descuentos de variantes.
+-- El checkout público usa available como única regla de compra.
+-- stock pertenece al flujo administrativo y no bloquea estos pedidos.
 create or replace function create_public_order(
   p_customer_name text,
   p_customer_phone text,
@@ -29,8 +30,7 @@ begin
   end if;
 
   for v_item in
-    select
-      (item->>'variant_id')::uuid as variant_id,
+    select (item->>'variant_id')::uuid as variant_id,
       sum((item->>'quantity')::integer)::integer as quantity
     from jsonb_array_elements(p_items) as items(item)
     group by (item->>'variant_id')::uuid
@@ -39,21 +39,16 @@ begin
       raise exception 'Cada item debe incluir una variante y una cantidad positiva';
     end if;
 
-    select id, price, discount_percentage, type, stock, available
+    select id, price, discount_percentage, type, available
       into v_variant
       from variants
-     where id = v_item.variant_id
-     for update;
+     where id = v_item.variant_id;
 
     if v_variant.id is null then
       raise exception 'Variante no encontrada';
     end if;
     if not v_variant.available then
       raise exception 'La variante seleccionada está marcada como no disponible';
-    end if;
-    if v_variant.stock < v_item.quantity then
-      raise exception 'Stock insuficiente para la variante seleccionada: disponible %, solicitado %',
-        v_variant.stock, v_item.quantity;
     end if;
 
     v_total := v_total + (
@@ -80,8 +75,7 @@ begin
   returning id into v_order_id;
 
   for v_item in
-    select
-      (item->>'variant_id')::uuid as variant_id,
+    select (item->>'variant_id')::uuid as variant_id,
       sum((item->>'quantity')::integer)::integer as quantity
     from jsonb_array_elements(p_items) as items(item)
     group by (item->>'variant_id')::uuid

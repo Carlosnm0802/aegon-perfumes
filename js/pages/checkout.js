@@ -225,6 +225,32 @@ function buildWhatsAppLink(cartItems, customerInfo, total, shippingFee) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
+async function registrarPedido(carrito, datosCliente, total) {
+  const { data: orderId, error } = await supabaseClient.rpc('create_public_order', {
+    p_customer_name: datosCliente.customer_name,
+    p_customer_phone: datosCliente.customer_phone,
+    p_customer_email: datosCliente.customer_email || null,
+    p_delivery_type: datosCliente.delivery_type,
+    p_delivery_address: datosCliente.delivery_address || null,
+    p_total: total,
+    p_items: carrito.map(item => ({
+      variant_id: item.variantId,
+      quantity: item.quantity,
+    })),
+  });
+
+  if (error) {
+    console.error('Detalle del error al registrar pedido:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+    throw new Error(error.message || 'No se pudo registrar el pedido.');
+  }
+  return orderId;
+}
+
 // ============================================================
 // INICIALIZACIÓN
 // ============================================================
@@ -256,6 +282,7 @@ async function iniciarCheckout() {
   const form = document.getElementById('checkout-form');
   const btnConfirmar = document.getElementById('btn-confirmar-pedido');
   const selectEntrega = document.getElementById('input-entrega');
+  const selectMetodoPago = document.getElementById('input-metodo-pago');
 
   selectEntrega.addEventListener('change', () => {
     renderResumenPedido(obtenerCarrito(), selectEntrega.value);
@@ -315,16 +342,25 @@ async function iniciarCheckout() {
 
       const subtotal = calcularTotal(carritoActual);
       const shippingFee = calcularCostoEnvio(subtotal, datosCliente.delivery_type);
+      const total = subtotal + shippingFee;
+      const orderId = await registrarPedido(carritoActual, datosCliente, total);
+
+      if (selectMetodoPago.value === 'transferencia') {
+        vaciarCarrito();
+        window.location.href = `confirmacion.html?metodo=transferencia&order_id=${encodeURIComponent(orderId)}`;
+        return;
+      }
+
       const enlaceWhatsApp = buildWhatsAppLink(carritoActual, {
         name: datosCliente.customer_name,
         deliveryType: datosCliente.delivery_type,
         deliveryAddress: datosCliente.delivery_address,
-      }, subtotal + shippingFee, shippingFee);
+      }, total, shippingFee);
       vaciarCarrito();
       window.location.href = enlaceWhatsApp;
     } catch (error) {
       console.error('Error preparando el pedido para WhatsApp:', error);
-      mostrarError('No pudimos preparar tu pedido. Intenta de nuevo en unos segundos.');
+      mostrarError(error.message || 'No pudimos preparar tu pedido. Intenta de nuevo en unos segundos.');
       btnConfirmar.disabled = false;
       btnConfirmar.textContent = TEXTO_BOTON_WHATSAPP;
     }

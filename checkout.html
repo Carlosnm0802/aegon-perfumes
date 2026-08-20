@@ -62,6 +62,14 @@
           </select>
         </div>
 
+        <div class="form-field">
+          <label for="input-metodo-pago">Forma de pago</label>
+          <select id="input-metodo-pago" name="payment_method" required>
+            <option value="transferencia">Transferencia bancaria</option>
+            <option value="whatsapp">Coordinar por WhatsApp</option>
+          </select>
+        </div>
+
         <!-- Solo se muestra si el tipo de entrega no es "recoger en persona" -->
         <div class="form-field" id="campo-direccion" hidden>
           <label for="input-direccion">Dirección de entrega</label>
