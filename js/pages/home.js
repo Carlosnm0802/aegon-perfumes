@@ -19,9 +19,9 @@ const TESTIMONIOS_DE_RESPALDO = [
 
 const IMAGENES_HERO = [
   'https://images.unsplash.com/photo-1594035910387-fea47794261f?w=1600&h=1200&fit=crop&q=80&auto=format',
-  'https://images.unsplash.com/photo-1557170334-a9086f3f5c9b?w=1600&h=1200&fit=crop&q=80&auto=format',
+  'assets/images/image3.png',
   'https://images.unsplash.com/photo-1505239034653-abfc95288b6c?w=1600&h=1200&fit=crop&q=80&auto=format',
-  'https://images.unsplash.com/photo-1616949755610-8c9bbc08f138?w=1600&h=1200&fit=crop&q=80&auto=format',
+  'assets/images/image6.png',
   'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%285%29.jpeg',
   'assets/images/WhatsApp%20Image%202026-08-06%20at%2012.40.30%20%2813%29.jpeg',
 ];
